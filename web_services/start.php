@@ -73,11 +73,14 @@ expose_function('user.getprofile',
                 false);
 
 function rest_user_getbyemail($email) {
-		$user = get_user_by_email ($email);
+		$user = get_user_by_email($email);
 		if (!$user) {
 			throw new InvalidParameterException("User not registered");
 		}
-		return $user;
+		foreach($user as $key => $singleuser) {
+			$foundusers[$key] = $singleuser->username;
+		}
+		return $foundusers;
 	} 
 
 expose_function('user.getbyemail',
