@@ -72,5 +72,37 @@ expose_function('user.getprofile',
                 false,
                 false);
 
+function rest_user_getbyemail($email) {
+		$user = get_user_by_email ($email);
+		if (!$user) {
+			throw new InvalidParameterException("User not registered");
+		}
+		return $user;
+	} 
+
+expose_function('user.getbyemail',
+                "rest_user_getbyemail",
+                array( 'email' => array ('type' => 'string'),
+					),
+                "Get site information",
+                'GET',
+                false,
+                false);
+
+function rest_site_getinfo() {
+		$siteinfo['url'] = elgg_get_config('www_root');
+		$siteinfo['sitename'] = elgg_get_config('site_name');
+		$siteinfo['language'] = elgg_get_config('language');
+		return $siteinfo;
+	} 
+
+expose_function('site.getinfo',
+                "rest_site_getinfo",
+                array( ),
+                "Get site information",
+                'GET',
+                false,
+                false);
+
 
 elgg_register_event_handler('init', 'system', 'blogapi_init');
