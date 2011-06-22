@@ -47,7 +47,7 @@ function rest_blog_post($username, $title, $excerpt, $text, $tags) {
 	
 expose_function('blog.post',
 				"rest_blog_post",
-				array( 'username' => array ('type' => 'string'),
+				array('username' => array ('type' => 'string'),
 						'title' => array ('type' => 'string'),
 						'excerpt' => array ('type' => 'string'),
 						'text' => array ('type' => 'string'),

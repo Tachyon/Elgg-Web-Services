@@ -6,7 +6,7 @@
  * @author Saket Saurabh
  *
  */
- 
+
 /**
  * Web service to get site information
  *
@@ -22,9 +22,9 @@ function rest_site_getinfo() {
 	} 
 
 expose_function('site.getinfo',
-                "rest_site_getinfo",
-                array( ),
-                "Get site information",
-                'GET',
-                false,
-                false);
+				"rest_site_getinfo",
+				array(),
+				"Get site information",
+				'GET',
+				false,
+				false);
