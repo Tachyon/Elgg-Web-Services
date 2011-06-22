@@ -6,12 +6,23 @@
  * @author Saket Saurabh
  *
  */
- 
-function rest_blog_post($username, $title, $excrept, $text, $tags) {
-		$user = get_user_by_username($username);
-		if (!$user) {
-			throw new InvalidParameterException("Bad username");
-		}
+
+/**
+ * Web service for making a blog post
+ *
+ * @param string $username username of author
+ * @param string $title    the title of blog
+ * @param string $excerpt  the excerpt of blog
+ * @param string $text     the content of blog
+ * @param string $tags     tags for blog
+ *
+ * @return bool
+ */
+function rest_blog_post($username, $title, $excerpt, $text, $tags) {
+	$user = get_user_by_username($username);
+	if (!$user) {
+		throw new InvalidParameterException("Bad username");
+	}
 		
 	$obj = new ElggObject();
 	$obj->subtype = "blog";
@@ -22,7 +33,7 @@ function rest_blog_post($username, $title, $excrept, $text, $tags) {
 	$obj->title = elgg_substr(strip_tags($title), 0, 140);
 	$obj->status = 'published';
 	$obj->comments_on = 'On';
-	$obj->excerpt = elgg_substr(strip_tags($excrept), 0, 140);
+	$obj->excerpt = elgg_substr(strip_tags($excerpt), 0, 140);
 	$obj->tags = elgg_substr(strip_tags($tags), 0, 140);
 	$guid = $obj->save();
 	add_to_river('river/object/blog/create',
@@ -35,14 +46,14 @@ function rest_blog_post($username, $title, $excrept, $text, $tags) {
 	} 
 	
 expose_function('blog.post',
-                "rest_blog_post",
-                array( 'username' => array ('type' => 'string'),
-					   'title' => array ('type' => 'string'),
-					   'excrept' => array ('type' => 'string'),
-                       'text' => array ('type' => 'string'),
-					   'tags' => array ('type' => 'string'),
-                     ),
-                "Post a blog post",
-                'GET',
-                false,
-                false);
+				"rest_blog_post",
+				array( 'username' => array ('type' => 'string'),
+						'title' => array ('type' => 'string'),
+						'excerpt' => array ('type' => 'string'),
+						'text' => array ('type' => 'string'),
+						'tags' => array ('type' => 'string'),
+					),
+				"Post a blog post",
+				'GET',
+				false,
+				false);

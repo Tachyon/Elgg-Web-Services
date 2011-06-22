@@ -7,6 +7,13 @@
  *
  */
 
+/**
+ * Web service to get profile information
+ *
+ * @param string $username username to get profile information
+ *
+ * @return string $user_fields Array of profile information with labels as the keys
+ */
 function rest_user_getprofile($username) {
 		$user = get_user_by_username($username);
 		if (!$user) {
@@ -29,6 +36,13 @@ expose_function('user.getprofile',
                 false,
                 false);
 
+/**
+ * Web service to get all users registered with an email ID
+ *
+ * @param string $email Email ID to check for
+ *
+ * @return string $foundusers Array of usernames registered with this email ID
+ */
 function rest_user_getbyemail($email) {
 		if (!validate_email_address($email)) {
 			throw new RegistrationException(elgg_echo('Invalid email address'));
@@ -54,22 +68,19 @@ expose_function('user.getbyemail',
                 false);
 
 /**
- * Function to check availability of username
- * 
- * @input Webservice
- * @output Saket Saurabh
+ * Web service to check availability of username
  *
- * @usage http://mysite.com/services/api/rest/xml/?method=user.checkavail&username=admin
- */
-
-            
+ * @param string $username Username to check for availaility 
+ *
+ * @return bool
+ */           
 function rest_user_checkailability($username) {
 		$user = get_user_by_username($username);
 		if (!$user) {
-			return "Username available";
+			return true;
 		}
 		else {
-			return "Username already registered";
+			return false;
 		}
 	} 
 
@@ -83,15 +94,15 @@ expose_function('user.checkavail',
                 false);
                 
 /**
- * Function to register user
- * 
- * @input Webservice
- * @output Saket Saurabh
+ * Web service to register user
  *
- * @usage http://mysite.com/services/api/rest/xml/?method=user.checkavail&username=admin
- */
-
-            
+ * @param string $name     Display name 
+ * @param string $email    Email ID 
+ * @param string $username Username
+ * @param string $password Password 
+ *
+ * @return bool
+ */           
 function rest_user_register($name, $email, $username, $password) {
 		$user = get_user_by_username($username);
 		if (!$user) {
