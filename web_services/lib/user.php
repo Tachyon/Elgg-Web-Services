@@ -31,7 +31,7 @@ expose_function('user.getprofile',
 				"rest_user_getprofile",
 				array('username' => array ('type' => 'string'),
 					),
-				"Get user profile informtion with username",
+				"Get user profile information with username",
 				'GET',
 				false,
 				false);
