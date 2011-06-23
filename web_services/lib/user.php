@@ -17,7 +17,7 @@
 function rest_user_getprofile($username) {
 	$user = get_user_by_username($username);
 	if (!$user) {
-		throw new InvalidParameterException("Bad username");
+		throw new InvalidParameterException('registration:usernamenotvalid');
 	}
 	
 	$user_fields = elgg_get_config('profile_fields');
@@ -25,7 +25,7 @@ function rest_user_getprofile($username) {
 		$user_fields[$key] = $user->$key;
 	}
 	return $user_fields;
-} 
+}
 	
 expose_function('user.getprofile',
 				"rest_user_getprofile",
@@ -45,18 +45,18 @@ expose_function('user.getprofile',
  */
 function rest_user_getbyemail($email) {
 	if (!validate_email_address($email)) {
-		throw new RegistrationException(elgg_echo('Invalid email address'));
+		throw new RegistrationException(elgg_echo('registration:notemail'));
 	}
 
 	$user = get_user_by_email($email);
 	if (!$user) {
-		throw new InvalidParameterException("User not registered");
+		throw new InvalidParameterException('registration:emailnotvalid');
 	}
 	foreach ($user as $key => $singleuser) {
 		$foundusers[$key] = $singleuser->username;
 	}
 	return $foundusers;
-} 
+}
 
 expose_function('user.getbyemail',
 				"rest_user_getbyemail",
@@ -81,7 +81,7 @@ function rest_user_checkailability($username) {
 	} else {
 		return false;
 	}
-} 
+}
 
 expose_function('user.checkavail',
 				"rest_user_checkailability",
@@ -107,9 +107,9 @@ function rest_user_register($name, $email, $username, $password) {
 	if (!$user) {
 		return register_user($username, $password, $name, $email);
 	} else {
-		throw new InvalidParameterException("Username already registered");
+		throw new InvalidParameterException('registration:userexists');
 	}
-} 
+}
 
 expose_function('user.register',
 				"rest_user_register",

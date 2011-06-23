@@ -21,7 +21,7 @@
 function rest_blog_post($username, $title, $excerpt, $text, $tags) {
 	$user = get_user_by_username($username);
 	if (!$user) {
-		throw new InvalidParameterException("Bad username");
+		throw new InvalidParameterException('registration:usernamenotvalid');
 	}
 		
 	$obj = new ElggObject();
