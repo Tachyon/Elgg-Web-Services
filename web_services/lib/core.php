@@ -8,6 +8,24 @@
  */
 
 /**
+ * Heartbeat web service
+ *
+ * @return string $response Hello
+ */
+function rest_site_test() {
+		$response = "Hello";
+		return $response;
+	} 
+
+expose_function('site.test',
+				"rest_site_test",
+				array(),
+				"Get site information",
+				'GET',
+				false,
+				false);
+
+/**
  * Web service to get site information
  *
  * @return string $url URL of Elgg website
