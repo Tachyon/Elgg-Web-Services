@@ -18,12 +18,17 @@
  *
  * @return bool
  */
-function rest_blog_post($username, $title, $excerpt, $text, $tags) {
+function rest_blog_post($username, $title, $excerpt, $text, $tags, $password) {
 	$user = get_user_by_username($username);
 	if (!$user) {
 		throw new InvalidParameterException('registration:usernamenotvalid');
 	}
-		
+	$pam = new ElggPAM('user');
+	$credentials = array('username' => $username, 'password' => $password);
+	$result = $pam->authenticate($credentials);
+	if (!$result) {
+		return $pam->getFailureMessage();
+	}
 	$obj = new ElggObject();
 	$obj->subtype = "blog";
 	$obj->owner_guid = $user->guid;
@@ -52,6 +57,7 @@ expose_function('blog.post',
 						'excerpt' => array ('type' => 'string'),
 						'text' => array ('type' => 'string'),
 						'tags' => array ('type' => 'string'),
+						'password' => array ('type' => 'string'),
 					),
 				"Post a blog post",
 				'GET',
