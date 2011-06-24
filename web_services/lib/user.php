@@ -8,6 +8,28 @@
  */
 
 /**
+ * Web service to get profile labels
+ *
+ * @return string $profile_labels Array of profile labels
+ */
+function rest_user_getprofilelabels() {	
+	$user_fields = elgg_get_config('profile_fields');
+	foreach ($user_fields as $key => $type) {
+		$profile_labels[$key]['label'] = elgg_echo('profile:'.$key);
+		$profile_labels[$key]['type'] = $type;
+	}
+	return $profile_labels;
+}
+	
+expose_function('user.profilelabels',
+				"rest_user_getprofilelabels",
+				array(),
+				"Get user profile labels",
+				'GET',
+				false,
+				false);
+
+/**
  * Web service to get profile information
  *
  * @param string $username username to get profile information
