@@ -228,7 +228,7 @@ expose_function('user.register',
 function rest_user_addfriend($username, $password, $friend) {
 	$user = get_user_by_username($username);
 	if (!$user) {
-		throw new InvalidParameterException('registration:usernamenotvalid');
+		throw new InvalidParameterException(elgg_echo('registration:usernamenotvalid'));
 	}
 	$pam = new ElggPAM('user');
 	$credentials = array('username' => $username, 'password' => $password);
@@ -265,6 +265,63 @@ function rest_user_addfriend($username, $password, $friend) {
 
 expose_function('user.addfriend',
 				"rest_user_addfriend",
+				array('username' => array ('type' => 'string'),
+						'password' => array ('type' => 'string'),
+						'friend' => array ('type' => 'string'),
+					),
+				"Register user",
+				'GET',
+				false,
+				false);	
+				
+
+/**
+ * Web service to remove friend
+ *
+ * @param string $username Username
+ * @param string $password Password 
+ * @param string $friend Username to be removed from friend
+ *
+ * @return bool
+ */           
+function rest_user_removefriend($username, $password, $friend) {
+	$user = get_user_by_username($username);
+	if (!$user) {
+		throw new InvalidParameterException(elgg_echo('registration:usernamenotvalid'));
+	}
+	$pam = new ElggPAM('user');
+	$credentials = array('username' => $username, 'password' => $password);
+	$result = $pam->authenticate($credentials);
+	if (!$result) {
+		return $pam->getFailureMessage();
+	}
+	
+	$friend_user = get_user_by_username($friend);
+	if (!$friend_user) {
+		throw new InvalidParameterException(elgg_echo("friends:remove:failure", array($friend_user->name)));
+	}
+	
+	if(!$friend_user->isFriendOf($user->guid)) {
+		throw new InvalidParameterException(elgg_echo('friends:remove:notfriend', array($friend_user->name)));
+	}
+	
+	try {
+		if (!$user->removeFriend($friend_user->guid)) {
+			$errors = true;
+		}
+	} catch (Exception $e) {
+		$errors = true;
+		throw new InvalidParameterException(elgg_echo("friends:remove:failure", array($friend_user->name)));
+	}
+
+	if (!$errors) {
+		system_message(elgg_echo("friends:remove:successful", array($friend->name)));
+		return true;
+	}
+}
+
+expose_function('user.removefriend',
+				"rest_user_removefriend",
 				array('username' => array ('type' => 'string'),
 						'password' => array ('type' => 'string'),
 						'friend' => array ('type' => 'string'),
