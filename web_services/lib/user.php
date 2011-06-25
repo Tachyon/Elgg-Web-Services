@@ -364,4 +364,38 @@ expose_function('user.getfriend',
 				'GET',
 				false,
 				false);	
+				
+/**
+ * Web service to obtains the people who have made a given user a friend
+ *
+ * @param string $username Username
+ * @param string $limit    Number of users to return
+ * @param string $offset   Indexing offset, if any
+ *
+ * @return array
+ */           
+function rest_user_getfriendof($username, $limit = 10, $offset = 0) {
+	$user = get_user_by_username($username);
+	if (!$user) {
+		throw new InvalidParameterException(elgg_echo('registration:usernamenotvalid'));
+	}
+	$friends = get_user_friends_of($user->guid, '' , $limit, $offset);
+
+	$return = array();
+	foreach($friends as $friend) {
+		$return[$friend->username] = $friend->name;
+	}
+	return $return;
+}
+
+expose_function('user.getfriendof',
+				"rest_user_getfriendof",
+				array('username' => array ('type' => 'string', 'required' => true),
+						'limit' => array ('type' => 'int', 'required' => false),
+						'offset' => array ('type' => 'int', 'required' => false),
+					),
+				"Register user",
+				'GET',
+				false,
+				false);	
 
