@@ -18,7 +18,7 @@
  *
  * @return bool
  */
-function rest_blog_post($username, $title, $excerpt, $text, $tags, $password) {
+function rest_blog_post($username, $title, $excerpt, $text, $tags, $access, $password) {
 	$user = get_user_by_username($username);
 	if (!$user) {
 		throw new InvalidParameterException('registration:usernamenotvalid');
@@ -32,14 +32,14 @@ function rest_blog_post($username, $title, $excerpt, $text, $tags, $password) {
 	$obj = new ElggObject();
 	$obj->subtype = "blog";
 	$obj->owner_guid = $user->guid;
-	$obj->access_id = ACCESS_PUBLIC;
+	$obj->access_id = strip_tags($access);
 	$obj->method = "api";
-	$obj->description = elgg_substr(strip_tags($text), 0, 140);
+	$obj->description = strip_tags($text);
 	$obj->title = elgg_substr(strip_tags($title), 0, 140);
 	$obj->status = 'published';
 	$obj->comments_on = 'On';
-	$obj->excerpt = elgg_substr(strip_tags($excerpt), 0, 140);
-	$obj->tags = elgg_substr(strip_tags($tags), 0, 140);
+	$obj->excerpt = strip_tags($excerpt);
+	$obj->tags = strip_tags($tags);
 	$guid = $obj->save();
 	add_to_river('river/object/blog/create',
 	'create',
@@ -57,9 +57,82 @@ expose_function('blog.post',
 						'excerpt' => array ('type' => 'string'),
 						'text' => array ('type' => 'string'),
 						'tags' => array ('type' => 'string'),
+						'access' => array ('type' => 'string'),
 						'password' => array ('type' => 'string'),
 					),
 				"Post a blog post",
+				'GET',
+				false,
+				false);
+				
+/**
+ * Web service for read a blog post
+ *
+ * @param string $guid     GUID of a blog entity
+ * @param string $username Username of reader (Send NULL if no user logged in)
+ * @param string $password Password for authentication of username (Send NULL if no user logged in)
+ *
+ * @return string $title       Title of blog post
+ * @return string $content     Text of blog post
+ * @return string $excerpt     Excerpt
+ * @return string $tags        Tags of blog post
+ * @return string $owner_guid  GUID of owner
+ * @return string $access_id   Access level of blog post (0,-2,1,2)
+ * @return string $status      (Published/Draft)
+ * @return string $comments_on On/Off
+ */
+function rest_blog_read($guid, $username, $password) {
+	$return = array();
+	$blog = get_entity($guid);
+
+	if (!elgg_instanceof($blog, 'object', 'blog')) {
+		$return['content'] = elgg_echo('blog:error:post_not_found');
+		return $return;
+	}
+	
+	$user = get_user_by_username($username);
+	if ($user) {
+		$pam = new ElggPAM('user');
+		$credentials = array('username' => $username, 'password' => $password);
+		$result = $pam->authenticate($credentials);
+		if (!$result) {
+			return $pam->getFailureMessage();
+		}
+	
+		if (!has_access_to_entity($blog, $user)) {
+			$return['content'] = elgg_echo('blog:error:post_not_found');
+			return $return;
+		}
+		
+		if ($blog->status!='published' && $user->guid!=$blog->owner_guid) {
+			$return['content'] = elgg_echo('blog:error:post_not_found');
+			return $return;
+		}
+	} else {
+		if($blog->access_id!=2) {
+			$return['content'] = elgg_echo('blog:error:post_not_found');
+			return $return;
+		}
+	}
+
+	$return['title'] = htmlspecialchars($blog->title);
+	$return['content'] = $blog->description;
+	$return['excerpt'] = $blog->excerpt;
+	$return['tags'] = $blog->tags;
+	$return['owner_guid'] = $blog->owner_guid;
+	$return['access_id'] = $blog->access_id;
+	$return['status'] = $blog->status;
+	$return['comments_on'] = $blog->comments_on;
+	return $return;
+}
+	
+expose_function('blog.read',
+				"rest_blog_read",
+				array('guid' => array ('type' => 'string'),
+						'username' => array ('type' => 'string'),
+						'password' => array ('type' => 'string'),
+					),
+				"Read a blog post",
 				'GET',
 				false,
 				false);
