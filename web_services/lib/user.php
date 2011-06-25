@@ -52,9 +52,9 @@ function rest_user_getprofile($username) {
 /**
  * Web service to update profile information
  *
- * @param string $username username to get profile information
+ * @param string $username username to update profile information
  *
- * @return string $user_fields Array of profile information with labels as the keys
+ * @return bool 
  */
 function rest_user_updateprofile($username, $profile) {
 	$user = get_user_by_username($username);
@@ -215,5 +215,62 @@ expose_function('user.register',
 				'GET',
 				false,
 				false);
-				
+
+/**
+ * Web service to add as friend
+ *
+ * @param string $username Username
+ * @param string $password Password 
+ * @param string $friend Username to be added as friend
+ *
+ * @return bool
+ */           
+function rest_user_addfriend($username, $password, $friend) {
+	$user = get_user_by_username($username);
+	if (!$user) {
+		throw new InvalidParameterException('registration:usernamenotvalid');
+	}
+	$pam = new ElggPAM('user');
+	$credentials = array('username' => $username, 'password' => $password);
+	$result = $pam->authenticate($credentials);
+	if (!$result) {
+		return $pam->getFailureMessage();
+	}
+	
+	$friend_user = get_user_by_username($friend);
+	if (!$friend_user) {
+		throw new InvalidParameterException(elgg_echo("friends:add:failure", array($friend_user->name)));
+	}
+	
+	if($friend_user->isFriendOf($user->guid)) {
+		throw new InvalidParameterException(elgg_echo('friends:alreadyadded', array($friend_user->name)));
+	}
+	
+	try {
+		if (!$user->addFriend($friend_user->guid)) {
+			$errors = true;
+		}
+		
+	} catch (Exception $e) {
+		$errors = true;
+		throw new InvalidParameterException(elgg_echo("friends:add:failure", array($friend_user->name)));
+	}
+
+	if (!$errors) {
+		// add to river
+		add_to_river('river/relationship/friend/create', 'friend', $user->guid, $friend_user->guid);
+		return true;
+	}
+}
+
+expose_function('user.addfriend',
+				"rest_user_addfriend",
+				array('username' => array ('type' => 'string'),
+						'password' => array ('type' => 'string'),
+						'friend' => array ('type' => 'string'),
+					),
+				"Register user",
+				'GET',
+				false,
+				false);				
 
