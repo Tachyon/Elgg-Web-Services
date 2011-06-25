@@ -330,4 +330,38 @@ expose_function('user.removefriend',
 				'GET',
 				false,
 				false);				
+				
+/**
+ * Web service to get friends of a user
+ *
+ * @param string $username Username
+ * @param string $limit    Number of users to return
+ * @param string $offset   Indexing offset, if any
+ *
+ * @return array
+ */           
+function rest_user_getfriend($username, $limit = 10, $offset = 0) {
+	$user = get_user_by_username($username);
+	if (!$user) {
+		throw new InvalidParameterException(elgg_echo('registration:usernamenotvalid'));
+	}
+	$friends = get_user_friends($user->guid, '' , $limit, $offset);
+
+	$return = array();
+	foreach($friends as $friend) {
+		$return[$friend->username] = $friend->name;
+	}
+	return $return;
+}
+
+expose_function('user.getfriend',
+				"rest_user_getfriend",
+				array('username' => array ('type' => 'string', 'required' => true),
+						'limit' => array ('type' => 'int', 'required' => false),
+						'offset' => array ('type' => 'int', 'required' => false),
+					),
+				"Register user",
+				'GET',
+				false,
+				false);	
 
