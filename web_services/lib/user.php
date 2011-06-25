@@ -49,12 +49,83 @@ function rest_user_getprofile($username) {
 	return $user_fields;
 }
 	
-expose_function('user.getprofile',
-				"rest_user_getprofile",
+/**
+ * Web service to update profile information
+ *
+ * @param string $username username to get profile information
+ *
+ * @return string $user_fields Array of profile information with labels as the keys
+ */
+function rest_user_updateprofile($username, $profile) {
+	$user = get_user_by_username($username);
+	if (!$user) {
+		throw new InvalidParameterException('registration:usernamenotvalid');
+	}
+	$owner = get_entity($user->guid);
+	$profile_fields = elgg_get_config('profile_fields');
+	foreach ($profile_fields as $shortname => $valuetype) {
+		$value = $profile[$shortname];
+		$value = html_entity_decode($value, ENT_COMPAT, 'UTF-8');
+
+		if ($valuetype != 'longtext' && elgg_strlen($value) > 250) {
+			$error = elgg_echo('profile:field_too_long', array(elgg_echo("profile:{$shortname}")));
+			return $error;
+		}
+
+		if ($valuetype == 'tags') {
+			$value = string_to_tag_array($value);
+		}
+		$input[$shortname] = $value;
+	}
+	
+	$name = strip_tags($profile['name']);
+	if ($name) {
+		if (elgg_strlen($name) > 50) {
+			return elgg_echo('user:name:fail');
+		} elseif ($owner->name != $name) {
+			$owner->name = $name;
+			return $owner->save();
+			if (!$owner->save()) {
+				return elgg_echo('user:name:fail');
+			}
+		}
+	}
+	
+	if (sizeof($input) > 0) {
+		foreach ($input as $shortname => $value) {
+			$options = array(
+				'guid' => $owner->guid,
+				'metadata_name' => $shortname
+			);
+			elgg_delete_metadata($options);
+			if (isset($accesslevel[$shortname])) {
+				$access_id = (int) $accesslevel[$shortname];
+			} else {
+				// this should never be executed since the access level should always be set
+				$access_id = ACCESS_DEFAULT;
+			}
+			if (is_array($value)) {
+				$i = 0;
+				foreach ($value as $interval) {
+					$i++;
+					$multiple = ($i > 1) ? TRUE : FALSE;
+					create_metadata($owner->guid, $shortname, $interval, 'text', $owner->guid, $access_id, $multiple);
+				}
+			} else {
+				create_metadata($owner->getGUID(), $shortname, $value, 'text', $owner->getGUID(), $access_id);
+			}
+		}
+	}
+	return "Success";
+}
+	
+expose_function('user.updateprofile',
+				"rest_user_updateprofile",
 				array('username' => array ('type' => 'string'),
+					 'profile' => array ('type' => 'array'),
 					),
 				"Get user profile information with username",
-				'GET',
+				'POST',
 				false,
 				false);
 
