@@ -192,3 +192,62 @@ expose_function('blog.delete',
 				'GET',
 				false,
 				false);
+
+								
+/**
+ * Web service for read latest wire post by friends
+ *
+ * @param string $username username
+ * @param string $password password
+ * @param string $limit    number of results to display
+ * @param string $offset   offset of list
+ *
+ * @return string $time_created Time at which blog post was made
+ * @return string $title        Title of blog post
+ * @return string $content      Text of blog post
+ * @return string $excerpt      Excerpt
+ * @return string $tags         Tags of blog post
+ * @return string $owner_guid   GUID of owner
+ * @return string $access_id    Access level of blog post (0,-2,1,2)
+ * @return string $status       (Published/Draft)
+ * @return string $comments_on  On/Off
+ */
+function rest_blog_friend($username, $password, $limit, $offset) {
+	$user = get_user_by_username($username);
+	if (!$user) {
+		throw new InvalidParameterException('registration:usernamenotvalid');
+	}
+	$pam = new ElggPAM('user');
+	$credentials = array('username' => $username, 'password' => $password);
+	$result = $pam->authenticate($credentials);
+	if (!$result) {
+		return $pam->getFailureMessage();
+	}
+
+	$posts = get_user_friends_objects($user->guid, 'blog', $limit = 10, $offset = 0);
+
+	foreach($posts as $single ) {
+		$blog[$single->guid]['time_created'] = $single->time_created;
+		$blog[$single->guid]['title'] = htmlspecialchars($single->title);
+		$blog[$single->guid]['content'] = $single->description;
+		$blog[$single->guid]['excerpt'] = $single->excerpt;
+		$blog[$single->guid]['tags'] = $single->tags;
+		$blog[$single->guid]['owner_guid'] = $single->owner_guid;
+		$blog[$single->guid]['access_id'] = $single->access_id;
+		$blog[$single->guid]['status'] = $single->status;
+		$blog[$single->guid]['comments_on'] = $single->comments_on;
+	}
+	return $blog;
+	} 
+				
+expose_function('blog.friend',
+				"rest_blog_friend",
+				array('username' => array ('type' => 'string'),
+						'password' => array ('type' => 'string'),
+						'limit' => array ('type' => 'int', 'required' => false),
+						'offset' => array ('type' => 'int', 'required' => false),
+					),
+				"Read lates wire post",
+				'GET',
+				false,
+				false);
