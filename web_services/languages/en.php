@@ -10,6 +10,7 @@ $english = array(
 	'web_services:selectfeatures' => "Select the features to be enabled",
 	'friends:alreadyadded' => "%s is already added as friend",
 	'friends:remove:notfriend' => "%s is not your friend",
+	'blog:message:notauthorized' => "Not authorized to carry this request",
 );
 				
 add_translation("en", $english);

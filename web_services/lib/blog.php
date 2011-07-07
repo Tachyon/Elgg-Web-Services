@@ -137,3 +137,58 @@ expose_function('blog.read',
 				'GET',
 				false,
 				false);
+				
+/**
+ * Web service for delete a blog post
+ *
+ * @param string $guid     GUID of a blog entity
+ * @param string $username Username of reader (Send NULL if no user logged in)
+ * @param string $password Password for authentication of username (Send NULL if no user logged in)
+ *
+ * @return bool
+ */
+function rest_blog_delete($guid, $username, $password) {
+	$return = array();
+	$blog = get_entity($guid);
+
+	if (!elgg_instanceof($blog, 'object', 'blog')) {
+		$return['content'] = elgg_echo('blog:error:post_not_found');
+		return $return;
+	}
+	
+	$user = get_user_by_username($username);
+	if ($user) {
+		$pam = new ElggPAM('user');
+		$credentials = array('username' => $username, 'password' => $password);
+		$result = $pam->authenticate($credentials);
+		if (!$result) {
+			return $pam->getFailureMessage();
+		}
+	}	
+	$blog = get_entity($guid);
+	if($user->guid!=$blog->owner_guid) {
+		return elgg_echo('blog:message:notauthorized');
+	}
+
+	if (elgg_instanceof($blog, 'object', 'blog') && $blog->canEdit()) {
+		$container = get_entity($blog->container_guid);
+		if ($blog->delete()) {
+			return elgg_echo('blog:message:deleted_post');
+		} else {
+			return elgg_echo('blog:error:cannot_delete_post');
+		}
+	} else {
+		return elgg_echo('blog:error:post_not_found');
+	}
+}
+	
+expose_function('blog.delete',
+				"rest_blog_delete",
+				array('guid' => array ('type' => 'string'),
+						'username' => array ('type' => 'string'),
+						'password' => array ('type' => 'string'),
+					),
+				"Read a blog post",
+				'GET',
+				false,
+				false);
