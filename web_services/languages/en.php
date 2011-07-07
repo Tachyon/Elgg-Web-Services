@@ -11,6 +11,7 @@ $english = array(
 	'friends:alreadyadded' => "%s is already added as friend",
 	'friends:remove:notfriend' => "%s is not your friend",
 	'blog:message:notauthorized' => "Not authorized to carry this request",
+	'blog:message:noposts' => "No blog posts by user",
 );
 				
 add_translation("en", $english);
