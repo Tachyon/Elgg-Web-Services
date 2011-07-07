@@ -18,11 +18,12 @@
  *
  * @return bool
  */
-function rest_blog_post($username, $title, $excerpt, $text, $tags, $access, $password) {
+function rest_blog_post($username, $title, $text, $password, $excerpt = "", $tags = "blog" , $access = 2) {
 	$user = get_user_by_username($username);
 	if (!$user) {
 		throw new InvalidParameterException('registration:usernamenotvalid');
 	}
+	
 	$pam = new ElggPAM('user');
 	$credentials = array('username' => $username, 'password' => $password);
 	$result = $pam->authenticate($credentials);
@@ -52,13 +53,13 @@ function rest_blog_post($username, $title, $excerpt, $text, $tags, $access, $pas
 	
 expose_function('blog.post',
 				"rest_blog_post",
-				array('username' => array ('type' => 'string'),
-						'title' => array ('type' => 'string'),
-						'excerpt' => array ('type' => 'string'),
-						'text' => array ('type' => 'string'),
-						'tags' => array ('type' => 'string'),
-						'access' => array ('type' => 'string'),
-						'password' => array ('type' => 'string'),
+				array('username' => array ('type' => 'string', 'required' => true),
+						'title' => array ('type' => 'string', 'required' => true),
+						'text' => array ('type' => 'string', 'required' => true),
+						'password' => array ('type' => 'string', 'required' => true),
+						'excerpt' => array ('type' => 'string', 'required' => false),
+						'tags' => array ('type' => 'string', 'required' => false),
+						'access' => array ('type' => 'string', 'required' => false),
 					),
 				"Post a blog post",
 				'GET',
