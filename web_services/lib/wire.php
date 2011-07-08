@@ -17,16 +17,10 @@
  *
  * @return bool
  */
-function rest_wire_post($username, $text, $access, $password) {
+function rest_wire_post($username, $text, $access = ACCESS_PUBLIC) {
 	$user = get_user_by_username($username);
 	if (!$user) {
 		throw new InvalidParameterException('registration:usernamenotvalid');
-	}
-	$pam = new ElggPAM('user');
-	$credentials = array('username' => $username, 'password' => $password);
-	$result = $pam->authenticate($credentials);
-	if (!$result) {
-		return $pam->getFailureMessage();
 	}
 	
 	if (empty($text)) {
@@ -45,12 +39,11 @@ expose_function('wire.post',
 				"rest_wire_post",
 				array('username' => array ('type' => 'string'),
 						'text' => array ('type' => 'string'),
-						'access' => array ('type' => 'string'),
-						'password' => array ('type' => 'string'),
+						'access' => array ('type' => 'string', 'required' => false),
 					),
 				"Post a wire post",
 				'GET',
-				false,
+				true,
 				false);
 				
 /**
@@ -93,22 +86,15 @@ expose_function('wire.read',
  * Web service for read latest wire post by friends
  *
  * @param string $username username
- * @param string $password password
  * @param string $limit    number of results to display
  * @param string $offset   offset of list
  *
  * @return bool
  */
-function rest_wire_friend($username, $password, $limit, $offset) {
+function rest_wire_friend($username, $password, $limit = 10, $offset = 0) {
 	$user = get_user_by_username($username);
 	if (!$user) {
 		throw new InvalidParameterException('registration:usernamenotvalid');
-	}
-	$pam = new ElggPAM('user');
-	$credentials = array('username' => $username, 'password' => $password);
-	$result = $pam->authenticate($credentials);
-	if (!$result) {
-		return $pam->getFailureMessage();
 	}
 
 	$posts = get_user_friends_objects($user->guid, 'thewire', $limit, $offset);
@@ -123,11 +109,10 @@ function rest_wire_friend($username, $password, $limit, $offset) {
 expose_function('wire.friend',
 				"rest_wire_friend",
 				array('username' => array ('type' => 'string'),
-						'password' => array ('type' => 'string'),
-						'limit' => array ('type' => 'int'),
-						'offset' => array ('type' => 'int'),
+						'limit' => array ('type' => 'int', 'required' => false),
+						'offset' => array ('type' => 'int', 'required' => false),
 					),
 				"Read lates wire post",
 				'GET',
-				false,
+				true,
 				false);

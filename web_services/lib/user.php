@@ -220,21 +220,14 @@ expose_function('user.register',
  * Web service to add as friend
  *
  * @param string $username Username
- * @param string $password Password 
  * @param string $friend Username to be added as friend
  *
  * @return bool
  */           
-function rest_user_addfriend($username, $password, $friend) {
+function rest_user_addfriend($username, $friend) {
 	$user = get_user_by_username($username);
 	if (!$user) {
 		throw new InvalidParameterException(elgg_echo('registration:usernamenotvalid'));
-	}
-	$pam = new ElggPAM('user');
-	$credentials = array('username' => $username, 'password' => $password);
-	$result = $pam->authenticate($credentials);
-	if (!$result) {
-		return $pam->getFailureMessage();
 	}
 	
 	$friend_user = get_user_by_username($friend);
@@ -271,7 +264,7 @@ expose_function('user.addfriend',
 					),
 				"Register user",
 				'GET',
-				false,
+				true,
 				false);	
 				
 
@@ -279,21 +272,14 @@ expose_function('user.addfriend',
  * Web service to remove friend
  *
  * @param string $username Username
- * @param string $password Password 
  * @param string $friend Username to be removed from friend
  *
  * @return bool
  */           
-function rest_user_removefriend($username, $password, $friend) {
+function rest_user_removefriend($username, $friend) {
 	$user = get_user_by_username($username);
 	if (!$user) {
 		throw new InvalidParameterException(elgg_echo('registration:usernamenotvalid'));
-	}
-	$pam = new ElggPAM('user');
-	$credentials = array('username' => $username, 'password' => $password);
-	$result = $pam->authenticate($credentials);
-	if (!$result) {
-		return $pam->getFailureMessage();
 	}
 	
 	$friend_user = get_user_by_username($friend);
@@ -328,7 +314,7 @@ expose_function('user.removefriend',
 					),
 				"Register user",
 				'GET',
-				false,
+				true,
 				false);				
 				
 /**

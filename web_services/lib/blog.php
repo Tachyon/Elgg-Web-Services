@@ -15,21 +15,16 @@
  * @param string $excerpt  the excerpt of blog
  * @param string $text     the content of blog
  * @param string $tags     tags for blog
+ * @param string $access   Access level of blog
  *
  * @return bool
  */
-function rest_blog_post($username, $title, $text, $password, $excerpt = "", $tags = "blog" , $access = 2) {
+function rest_blog_post($username, $title, $text, $excerpt = "", $tags = "blog" , $access = ACCESS_PUBLIC) {
 	$user = get_user_by_username($username);
 	if (!$user) {
 		throw new InvalidParameterException('registration:usernamenotvalid');
 	}
 	
-	$pam = new ElggPAM('user');
-	$credentials = array('username' => $username, 'password' => $password);
-	$result = $pam->authenticate($credentials);
-	if (!$result) {
-		return $pam->getFailureMessage();
-	}
 	$obj = new ElggObject();
 	$obj->subtype = "blog";
 	$obj->owner_guid = $user->guid;
@@ -56,14 +51,13 @@ expose_function('blog.post',
 				array('username' => array ('type' => 'string', 'required' => true),
 						'title' => array ('type' => 'string', 'required' => true),
 						'text' => array ('type' => 'string', 'required' => true),
-						'password' => array ('type' => 'string', 'required' => true),
 						'excerpt' => array ('type' => 'string', 'required' => false),
 						'tags' => array ('type' => 'string', 'required' => false),
 						'access' => array ('type' => 'string', 'required' => false),
 					),
 				"Post a blog post",
-				'GET',
-				false,
+				'POST',
+				true,
 				false);
 				
 /**
@@ -82,7 +76,7 @@ expose_function('blog.post',
  * @return string $status      (Published/Draft)
  * @return string $comments_on On/Off
  */
-function rest_blog_read($guid, $username, $password) {
+function rest_blog_read($guid, $username) {
 	$return = array();
 	$blog = get_entity($guid);
 
@@ -93,13 +87,6 @@ function rest_blog_read($guid, $username, $password) {
 	
 	$user = get_user_by_username($username);
 	if ($user) {
-		$pam = new ElggPAM('user');
-		$credentials = array('username' => $username, 'password' => $password);
-		$result = $pam->authenticate($credentials);
-		if (!$result) {
-			return $pam->getFailureMessage();
-		}
-	
 		if (!has_access_to_entity($blog, $user)) {
 			$return['content'] = elgg_echo('blog:error:post_not_found');
 			return $return;
@@ -131,11 +118,10 @@ expose_function('blog.read',
 				"rest_blog_read",
 				array('guid' => array ('type' => 'string'),
 						'username' => array ('type' => 'string'),
-						'password' => array ('type' => 'string'),
 					),
 				"Read a blog post",
 				'GET',
-				false,
+				true,
 				false);
 				
 /**
@@ -147,7 +133,7 @@ expose_function('blog.read',
  *
  * @return bool
  */
-function rest_blog_delete($guid, $username, $password) {
+function rest_blog_delete($guid, $username) {
 	$return = array();
 	$blog = get_entity($guid);
 
@@ -157,14 +143,9 @@ function rest_blog_delete($guid, $username, $password) {
 	}
 	
 	$user = get_user_by_username($username);
-	if ($user) {
-		$pam = new ElggPAM('user');
-		$credentials = array('username' => $username, 'password' => $password);
-		$result = $pam->authenticate($credentials);
-		if (!$result) {
-			return $pam->getFailureMessage();
-		}
-	}	
+	if (!$user) {
+		throw new InvalidParameterException('registration:usernamenotvalid');
+	}
 	$blog = get_entity($guid);
 	if($user->guid!=$blog->owner_guid) {
 		return elgg_echo('blog:message:notauthorized');
@@ -186,11 +167,10 @@ expose_function('blog.delete',
 				"rest_blog_delete",
 				array('guid' => array ('type' => 'string'),
 						'username' => array ('type' => 'string'),
-						'password' => array ('type' => 'string'),
 					),
 				"Read a blog post",
 				'GET',
-				false,
+				true,
 				false);
 
 								
@@ -212,16 +192,10 @@ expose_function('blog.delete',
  * @return string $status       (Published/Draft)
  * @return string $comments_on  On/Off
  */
-function rest_blog_friend($username, $password, $limit = 10, $offset = 0) {
+function rest_blog_friend($username, $limit = 10, $offset = 0) {
 	$user = get_user_by_username($username);
 	if (!$user) {
 		throw new InvalidParameterException('registration:usernamenotvalid');
-	}
-	$pam = new ElggPAM('user');
-	$credentials = array('username' => $username, 'password' => $password);
-	$result = $pam->authenticate($credentials);
-	if (!$result) {
-		return $pam->getFailureMessage();
 	}
 
 	$posts = get_user_friends_objects($user->guid, 'blog', $limit = 10, $offset = 0);
@@ -252,14 +226,13 @@ expose_function('blog.friend',
 					),
 				"Read lates wire post",
 				'GET',
-				false,
+				true,
 				false);
 				
 /**
  * Web service for read latest wire post by friends
  *
  * @param string $username username
- * @param string $password password
  * @param string $limit    number of results to display
  * @param string $offset   offset of list
  *
@@ -316,5 +289,5 @@ expose_function('blog.user',
 					),
 				"Read latest wire post by a single user",
 				'GET',
-				false,
+				true,
 				false);
