@@ -12,7 +12,6 @@
  *
  * @param string $username username of author
  * @param string $groupid  GUID of the group
- * @param string $password password of user
  *
  * @return bool
  */
@@ -20,12 +19,6 @@ function rest_group_join($username, $groupid, $password) {
 	$user = get_user_by_username($username);
 	if (!$user) {
 		throw new InvalidParameterException('registration:usernamenotvalid');
-	}
-	$pam = new ElggPAM('user');
-	$credentials = array('username' => $username, 'password' => $password);
-	$result = $pam->authenticate($credentials);
-	if (!$result) {
-		return $pam->getFailureMessage();
 	}
 	
 	$group = get_entity($groupid);
@@ -80,11 +73,10 @@ expose_function('group.join',
 				"rest_group_join",
 				array('username' => array ('type' => 'string'),
 						'groupid' => array ('type' => 'string'),
-						'password' => array ('type' => 'string'),
 					),
 				"Join a group",
 				'GET',
-				false,
+				true,
 				false);
 				
  /**
@@ -92,20 +84,13 @@ expose_function('group.join',
  *
  * @param string $username username of author
  * @param string $groupid  GUID of the group
- * @param string $password password of user
  *
  * @return bool
  */
-function rest_group_leave($username, $groupid, $password) {
+function rest_group_leave($username, $groupid) {
 	$user = get_user_by_username($username);
 	if (!$user) {
 		throw new InvalidParameterException('registration:usernamenotvalid');
-	}
-	$pam = new ElggPAM('user');
-	$credentials = array('username' => $username, 'password' => $password);
-	$result = $pam->authenticate($credentials);
-	if (!$result) {
-		return $pam->getFailureMessage();
 	}
 	
 	$group = get_entity($groupid);
@@ -130,10 +115,71 @@ expose_function('group.leave',
 				"rest_group_leave",
 				array('username' => array ('type' => 'string'),
 						'groupid' => array ('type' => 'string'),
-						'password' => array ('type' => 'string'),
 					),
 				"leave a group",
 				'GET',
-				false,
+				true,
 				false);
 				
+ /**
+ * Web service for posting a new topic to a group
+ *
+ * @param string $username       username of author
+ * @param string $groupid        GUID of the group
+ * @param string $title          Title of new topic
+ * @param string $description    Content of the post
+ * @param string $status         status of the post
+ * @param string $access_id      Access ID of the post
+ *
+ * @return bool
+ */
+function rest_group_post($username, $groupid, $title, $desc, $tags = "", $status = "published", $access_id = ACCESS_DEFAULT) {
+	$user = get_user_by_username($username);
+	if (!$user) {
+		throw new InvalidParameterException('registration:usernamenotvalid');
+	}
+	$group = get_entity($groupid);
+	if (!$group) {
+		register_error(elgg_echo('group:notfound'));
+		forward();
+	}
+
+	// make sure user has permissions to write to container
+	if (!can_write_to_container($user->guid, $groupid, "all", "all")) {
+		return elgg_echo('groups:permissions:error');
+	}
+	
+	$topic = new ElggObject();
+	$topic->subtype = 'groupforumtopic';
+	$topic->owner_guid = $user->guid;
+	$topic->title = $title;
+	$topic->description = $desc;
+	$topic->status = $status;
+	$topic->access_id = $access_id;
+	$topic->container_guid = $groupid;
+			
+	$tags = explode(",", $tags);
+	$topic->tags = $tags;
+
+	$result = $topic->save();
+
+	if (!$result) {
+		return elgg_echo('discussion:error:notsaved');
+	}
+	return elgg_echo('discussion:topic:created');
+} 
+				
+expose_function('group.post',
+				"rest_group_post",
+				array('username' => array ('type' => 'string'),
+						'groupid' => array ('type' => 'int'),
+						'title' => array ('type' => 'string'),
+						'desc' => array ('type' => 'string'),
+						'tags' => array ('type' => 'string', 'required' => false),
+						'status' => array ('type' => 'string', 'required' => false),
+						'access_id' => array ('type' => 'int', 'required' => false),
+					),
+				"Post to a group",
+				'POST',
+				true,
+				false);
