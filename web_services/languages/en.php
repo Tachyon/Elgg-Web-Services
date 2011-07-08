@@ -7,6 +7,11 @@
  */
 
 $english = array(
+	'web_services:user' => "User", 
+	'web_services:blog' => "Blog", 
+	'web_services:wire' => "Wire", 
+	'web_services:core' => "Core", 
+	'web_services:group' => "Group",
 	'web_services:selectfeatures' => "Select the features to be enabled",
 	'friends:alreadyadded' => "%s is already added as friend",
 	'friends:remove:notfriend' => "%s is not your friend",
