@@ -17,6 +17,10 @@ $english = array(
 	'friends:remove:notfriend' => "%s is not your friend",
 	'blog:message:notauthorized' => "Not authorized to carry this request",
 	'blog:message:noposts' => "No blog posts by user",
+
+	'admin:utilities:web_services' => 'Web Services Tests',
+	'web_services:tests:instructions' => 'Run the unit tests for the web services plugin',
+	'web_services:tests:run' => 'Run tests',
 );
 				
 add_translation("en", $english);
