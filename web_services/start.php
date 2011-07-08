@@ -6,7 +6,7 @@
  * @author Saket Saurabh
  *
  */
-function blogapi_init() {
+function web_services_init() {
 	$action_base = elgg_get_plugins_path() . 'web_services/actions';
 	elgg_register_action('settings/web_services/save', "$action_base/save.php", "admin");
 }
@@ -19,4 +19,4 @@ foreach($enabled as $service) {
 }
 
 
-elgg_register_event_handler('init', 'system', 'blogapi_init');
+elgg_register_event_handler('init', 'system', 'web_services_init');
