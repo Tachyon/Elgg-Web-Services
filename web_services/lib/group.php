@@ -246,7 +246,7 @@ expose_function('group.latest',
  *
  * @return bool
  */
-function rest_group_replies($postid, $limit = 10, $offset = 0) {
+function rest_group_getreplies($postid, $limit = 10, $offset = 0) {
 	$group = get_entity($postid);
 	$options = array(
 		'guid' => $postid,
@@ -274,13 +274,64 @@ function rest_group_replies($postid, $limit = 10, $offset = 0) {
 	return $post;
 } 
 				
-expose_function('group.replies',
-				"rest_group_replies",
+expose_function('group.getreplies',
+				"rest_group_getreplies",
 				array('postid' => array ('type' => 'string'),
 					  'limit' => array ('type' => 'int', 'required' => false),
 					  'offset' => array ('type' => 'int', 'required' => false),
 					),
 				"Get posts from a group",
 				'GET',
-				false,
+				true,
+				false);
+				
+/**
+ * Web service post a reply
+ *
+ * @param string $username username
+ * @param string $postid   GUID of post
+ * @param string $text     text of reply
+ *
+ * @return bool
+ */
+function rest_group_reply($username, $postid, $text) {
+	$entity_guid = (int) get_input('entity_guid');
+
+	if (empty($text)) {
+		return elgg_echo('grouppost:nopost');
+	}
+
+	$topic = get_entity($postid);
+	if (!$topic) {
+		return elgg_echo('grouppost:nopost');
+	}
+
+	$user = get_user_by_username($username);
+	if (!$user) {
+		return elgg_echo('registration:usernamenotvalid');
+	}
+
+	$group = $topic->getContainerEntity();
+	if (!$group->canWriteToContainer($user)) {
+		return elgg_echo('groups:notmember');
+	}
+
+	$reply_id = $topic->annotate('group_topic_post', $text, $topic->access_id, $user->guid);
+	if ($reply_id == false) {
+		return elgg_echo('groupspost:failure');
+	}
+
+	add_to_river('river/annotation/group_topic_post/reply', 'reply', $user->guid, $topic->guid, "", 0, $reply_id);
+	return true;
+} 
+				
+expose_function('group.reply',
+				"rest_group_reply",
+				array('username' => array ('type' => 'string'),
+						'postid' => array ('type' => 'string'),
+						'text' => array ('type' => 'string'),
+					),
+				"Post a reply to a group",
+				'POST',
+				true,
 				false);
