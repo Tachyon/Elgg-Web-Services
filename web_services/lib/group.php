@@ -221,7 +221,7 @@ function rest_group_latest($groupid, $limit = 10, $offset = 0) {
 		}
 	}
 	else {
-		$post = elgg_echo('file:message:file');
+		$post = elgg_echo('discussion:topic:notfound');
 	}
 	return $post;
 } 
@@ -237,3 +237,50 @@ expose_function('group.latest',
 				true,
 				false);
 
+/**
+ * Web service get replies on a post
+ *
+ * @param string $postid GUID of the group
+ * @param string $limit   (optional) default 10
+ * @param string $offset  (optional) default 0
+ *
+ * @return bool
+ */
+function rest_group_replies($postid, $limit = 10, $offset = 0) {
+	$group = get_entity($postid);
+	$options = array(
+		'guid' => $postid,
+		'annotation_name' => 'group_topic_post',
+		'limit' => $limit,
+		'offset' => $offset,
+	);
+	$content = elgg_get_annotations($options);
+	if($content) {
+		foreach($content as $single ) {
+			$post[$single->value_id]['value'] = $single->value;
+			$post[$single->value_id]['name'] = $single->name;
+			$post[$single->value_id]['enabled'] = $single->enabled;
+			$post[$single->value_id]['owner_guid'] = $single->owner_guid;
+			$post[$single->value_id]['entity_guid'] = $single->entity_guid;
+			$post[$single->value_id]['access_id'] = $single->access_id;
+			$post[$single->value_id]['time_created'] = $single->time_created;
+			$post[$single->value_id]['name_id'] = $single->name_id;
+			$post[$single->value_id]['value_type'] = $single->value_type;
+		}
+	}
+	else {
+		$post = elgg_echo('discussion:reply:noreplies');
+	}
+	return $post;
+} 
+				
+expose_function('group.replies',
+				"rest_group_replies",
+				array('postid' => array ('type' => 'string'),
+					  'limit' => array ('type' => 'int', 'required' => false),
+					  'offset' => array ('type' => 'int', 'required' => false),
+					),
+				"Get posts from a group",
+				'GET',
+				false,
+				false);
