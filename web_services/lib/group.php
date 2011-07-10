@@ -184,6 +184,49 @@ expose_function('group.post',
 				false);
 				
 /**
+ * Web service for posting a new topic to a group
+ *
+ * @param string $username username of author
+ * @param string $topicid  Topic ID
+ *
+ * @return bool
+ */
+function rest_group_deletepost($username, $topicid) {
+	$topic = get_entity($topicid);
+	if (!$topic || !$topic->getSubtype() == "groupforumtopic") {
+		return elgg_echo('discussion:error:notdeleted');
+	}
+
+	$user = get_user_by_username($username);
+	if (!$user) {
+		return elgg_echo('registration:usernamenotvalid');
+	}
+
+	if (!$topic->canEdit($user->guid)) {
+		return elgg_echo('discussion:error:permissions');
+	}
+
+	$container = $topic->getContainerEntity();
+
+	$result = $topic->delete();
+	if ($result) {
+		return elgg_echo('discussion:topic:deleted');
+	} else {
+		return elgg_echo('discussion:error:notdeleted');
+	}
+} 
+				
+expose_function('group.deletepost',
+				"rest_group_deletepost",
+				array('username' => array ('type' => 'string'),
+						'topicid' => array ('type' => 'int'),
+					),
+				"Post to a group",
+				'POST',
+				true,
+				false);
+				
+/**
  * Web service get latest post in a group
  *
  * @param string $groupid GUID of the group
@@ -283,7 +326,7 @@ expose_function('group.getreplies',
 					),
 				"Get posts from a group",
 				'GET',
-				false,
+				true,
 				false);
 				
 /**
