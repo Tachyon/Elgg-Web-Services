@@ -140,8 +140,7 @@ function rest_group_post($username, $groupid, $title, $desc, $tags = "", $status
 	}
 	$group = get_entity($groupid);
 	if (!$group) {
-		register_error(elgg_echo('group:notfound'));
-		forward();
+		return elgg_echo('group:notfound');
 	}
 
 	// make sure user has permissions to write to container
@@ -183,3 +182,58 @@ expose_function('group.post',
 				'POST',
 				true,
 				false);
+				
+/**
+ * Web service get latest post in a group
+ *
+ * @param string $groupid GUID of the group
+ * @param string $limit   (optional) default 10
+ * @param string $offset  (optional) default 0
+ *
+ * @return bool
+ */
+function rest_group_latest($groupid, $limit = 10, $offset = 0) {
+	$group = get_entity($groupid);
+	if (!$group) {
+		return elgg_echo('group:notfound');
+	}
+	
+	$options = array(
+		'type' => 'object',
+		'subtype' => 'groupforumtopic',
+		'container_guid' => $groupid,
+		'limit' => $limit,
+		'offset' => $offset,
+		'full_view' => false,
+		'pagination' => false,
+	);
+	$content = elgg_get_entities($options);
+	if($content) {
+		foreach($content as $single ) {
+			$post[$single->guid]['title'] = $single->title;
+			$post[$single->guid]['description'] = $single->description;
+			$post[$single->guid]['owner_guid'] = $single->owner_guid;
+			$post[$single->guid]['container_guid'] = $single->container_guid;
+			$post[$single->guid]['access_id'] = $single->access_id;
+			$post[$single->guid]['time_created'] = $single->time_created;
+			$post[$single->guid]['time_updated'] = $single->time_updated;
+			$post[$single->guid]['last_action'] = $single->last_action;
+		}
+	}
+	else {
+		$post = elgg_echo('file:message:file');
+	}
+	return $post;
+} 
+				
+expose_function('group.latest',
+				"rest_group_latest",
+				array('groupid' => array ('type' => 'string'),
+					  'limit' => array ('type' => 'int', 'required' => false),
+					  'offset' => array ('type' => 'int', 'required' => false),
+					),
+				"Get posts from a group",
+				'GET',
+				true,
+				false);
+
