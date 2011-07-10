@@ -257,15 +257,16 @@ function rest_group_getreplies($postid, $limit = 10, $offset = 0) {
 	$content = elgg_get_annotations($options);
 	if($content) {
 		foreach($content as $single ) {
-			$post[$single->value_id]['value'] = $single->value;
-			$post[$single->value_id]['name'] = $single->name;
-			$post[$single->value_id]['enabled'] = $single->enabled;
-			$post[$single->value_id]['owner_guid'] = $single->owner_guid;
-			$post[$single->value_id]['entity_guid'] = $single->entity_guid;
-			$post[$single->value_id]['access_id'] = $single->access_id;
-			$post[$single->value_id]['time_created'] = $single->time_created;
-			$post[$single->value_id]['name_id'] = $single->name_id;
-			$post[$single->value_id]['value_type'] = $single->value_type;
+			$post[$single->id]['value'] = $single->value;
+			$post[$single->id]['name'] = $single->name;
+			$post[$single->id]['enabled'] = $single->enabled;
+			$post[$single->id]['owner_guid'] = $single->owner_guid;
+			$post[$single->id]['entity_guid'] = $single->entity_guid;
+			$post[$single->id]['access_id'] = $single->access_id;
+			$post[$single->id]['time_created'] = $single->time_created;
+			$post[$single->id]['name_id'] = $single->name_id;
+			$post[$single->id]['value_id'] = $single->value_id;
+			$post[$single->id]['value_type'] = $single->value_type;
 		}
 	}
 	else {
@@ -282,7 +283,7 @@ expose_function('group.getreplies',
 					),
 				"Get posts from a group",
 				'GET',
-				true,
+				false,
 				false);
 				
 /**
@@ -320,7 +321,7 @@ function rest_group_reply($username, $postid, $text) {
 	if ($reply_id == false) {
 		return elgg_echo('groupspost:failure');
 	}
-
+	
 	add_to_river('river/annotation/group_topic_post/reply', 'reply', $user->guid, $topic->guid, "", 0, $reply_id);
 	return true;
 } 
@@ -332,6 +333,47 @@ expose_function('group.reply',
 						'text' => array ('type' => 'string'),
 					),
 				"Post a reply to a group",
+				'POST',
+				true,
+				false);
+				
+/**
+ * Web service post a reply
+ *
+ * @param string $username username
+ * @param string $id       Annotation ID of reply
+ *
+ * @return bool
+ */
+function rest_group_deletereply($username, $id) {
+	$reply = elgg_get_annotation_from_id($id);
+	if (!$reply || $reply->name != 'group_topic_post') {
+		return elgg_echo('discussion:reply:error:notdeleted');
+	}
+	
+	$user = get_user_by_username($username);
+	if (!$user) {
+		return elgg_echo('registration:usernamenotvalid');
+	}
+
+	if (!$reply->canEdit($user->guid)) {
+		return elgg_echo('discussion:error:permissions');
+	}
+
+	$result = $reply->delete();
+	if ($result) {
+		return elgg_echo('discussion:reply:deleted');
+	} else {
+		return elgg_echo('discussion:reply:error:notdeleted');
+	}
+} 
+				
+expose_function('group.deletereply',
+				"rest_group_deletereply",
+				array('username' => array ('type' => 'string'),
+						'id' => array ('type' => 'string'),
+					),
+				"Delete a reply from a group",
 				'POST',
 				true,
 				false);
