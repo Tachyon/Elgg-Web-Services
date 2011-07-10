@@ -48,8 +48,9 @@ expose_function('file.all',
 /**
  * Web service to get file list by all users
  *
- * @param string $limit  (optional) default 10
- * @param string $offset (optional) default 0
+ * @param string $username  username
+ * @param string $limit     (optional) default 10
+ * @param string $offset    (optional) default 0
  *
  * @return array $file Array of files uploaded
  */
@@ -58,10 +59,7 @@ function rest_file_friend($username, $limit = 10, $offset = 0) {
 	if (!$user) {
 		throw new InvalidParameterException('registration:usernamenotvalid');
 	}
-
 	$latest_file = get_user_friends_objects($user->guid, 'file', $limit, $offset);
-
-	$latest_file = elgg_get_entities($params);
 	foreach($latest_file as $single ) {
 		$file[$single->guid]['title'] = $single->title;
 		$file[$single->guid]['owner_guid'] = $single->owner_guid;
@@ -74,8 +72,8 @@ function rest_file_friend($username, $limit = 10, $offset = 0) {
 	return $file;
 }
 	
-expose_function('file.all',
-				"rest_file_all",
+expose_function('file.friend',
+				"rest_file_friend",
 				array('username' => array ('type' => 'string'),
 					  'limit' => array ('type' => 'int', 'required' => false),
 					  'offset' => array ('type' => 'int', 'required' => false),
