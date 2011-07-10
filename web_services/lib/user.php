@@ -112,7 +112,7 @@ function rest_user_updateprofile($username, $profile) {
 					create_metadata($owner->guid, $shortname, $interval, 'text', $owner->guid, $access_id, $multiple);
 				}
 			} else {
-				create_metadata($owner->getGUID(), $shortname, $value, 'text', $owner->getGUID(), $access_id);
+				create_metadata($owner->guid, $shortname, $value, 'text', $owner->guid, $access_id);
 			}
 		}
 	}
@@ -126,7 +126,7 @@ expose_function('user.updateprofile',
 					),
 				"Get user profile information with username",
 				'POST',
-				false,
+				true,
 				false);
 
 /**
