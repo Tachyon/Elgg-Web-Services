@@ -15,6 +15,7 @@ function web_services_init() {
 
 	// register with a low priority so that we can replace all unit tests
 	elgg_register_plugin_hook_handler('unit_test', 'system', 'web_services_test', 1000);
+	elgg_register_admin_menu_item('administer', 'web_services', 'utilities');
 }
 
 $enabled = unserialize(elgg_get_plugin_setting('enabled_webservices', 'web_services'));
