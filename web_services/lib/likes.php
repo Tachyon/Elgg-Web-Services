@@ -54,3 +54,35 @@ expose_function('likes.add',
 				true,
 				false);
 				
+/**
+ * Web service to unlike an entity
+ *
+ * @param string $entity_guid guid of object to like
+ *
+ * @return bool
+ */
+function rest_likes_delete($entity_guid) {
+	$likes = elgg_get_annotations(array(
+		'guid' => $entity_guid,
+		'annotation_owner_guid' => elgg_get_logged_in_user_guid(),
+		'annotation_name' => 'likes',
+	));
+	if ($likes) {
+		if ($likes[0]->canEdit()) {
+			$likes[0]->delete();
+			return elgg_echo("likes:deleted");
+		}
+	}
+
+	return elgg_echo("likes:notdeleted");
+} 
+				
+expose_function('likes.delete',
+				"rest_likes_delete",
+				array('entity_guid' => array ('type' => 'int'),
+					),
+				"Delete a like",
+				'POST',
+				true,
+				false);
+				
