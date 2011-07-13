@@ -18,7 +18,11 @@ class ElggWebServicesUserTest extends ElggCoreUnitTest {
 	 * Called before each test method.
 	 */
 	public function setUp() {
-		$this->client = new ElggApiClient(elgg_get_site_url());
+		$this->client = new ElggApiClient(elgg_get_site_url(), '2dcbe06b8318d8b3ea72523f7135ae6edfcc75c1');
+		$result = $this->client->obtainAuthToken('admin', 'admin123');
+		if (!$result) {
+		   echo "Wrror in getting auth token!\n";
+		}
 	}
 
 	/**
@@ -56,5 +60,39 @@ class ElggWebServicesUserTest extends ElggCoreUnitTest {
 		foreach ($user_fields as $key => $type) {
 			$this->assertEqual($results->$key, $user->$key);
 		}
+	}
+	
+	public function testUpdateProfile() {
+		$profile = array('description' => 'description test',
+						'briefdescription' => 'briefdescription test',
+						'location' => 'India',
+						'interests' => 'my interest',
+						'skills' => 'my skills',
+						'contactemail' => 'myemail@email.com',
+						'phone' => '01234567890',
+						'mobile' => '11234567890',
+						'website' => 'http://mywebsite.com',
+						'twitter' => 'tweet',
+						);
+		$params = array('username' => 'admin',
+						'profile' => $profile
+						);	
+		$user = get_user_by_username('admin');
+		$user_fields = elgg_get_config('profile_fields');
+		foreach ($user_fields as $key => $type) {
+			$profilebackup[$key] = $user->$key;
+		}
+		
+		$results = $this->client->post('user.updateprofile', $params);
+		
+		foreach ($user_fields as $key => $type) {
+			$this->assertEqual($profile[$key], $user->$key);
+		}
+		var_dump($user->description);
+		//restoring original profile
+		$params = array('username' => 'admin',
+						'profile' => $profilebackup
+						);
+		$results = $this->client->post('user.updateprofile', $params);
 	}
 }
