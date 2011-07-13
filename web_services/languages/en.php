@@ -22,6 +22,8 @@ $english = array(
 	'admin:utilities:web_services' => 'Web Services Tests',
 	'web_services:tests:instructions' => 'Run the unit tests for the web services plugin',
 	'web_services:tests:run' => 'Run tests',
+	'web_services:likes' => 'Likes',
+	'likes:notallowed' => 'Not allowed to like',
 );
 				
 add_translation("en", $english);

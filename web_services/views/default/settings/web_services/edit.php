@@ -14,7 +14,8 @@ echo elgg_view("input/checkboxes", array(
 								elgg_echo("web_services:wire") => 'wire', 
 								elgg_echo("web_services:core") => 'core', 
 								elgg_echo("web_services:group") => 'group',
-								elgg_echo("web_services:file") => 'file')
+								elgg_echo("web_services:file") => 'file',
+								elgg_echo("web_services:likes") => 'likes'),
 			));
 
 echo '</div>';
