@@ -116,3 +116,52 @@ expose_function('wire.friend',
 				'GET',
 				true,
 				false);
+				
+/**
+ * Web service for delete a wire post
+ *
+ * @param string $username username
+ * @param string $wireid   GUID of wire post to delete
+ *
+ * @return bool
+ */
+function rest_wire_delete($username, $wireid) {
+	$user = get_user_by_username($username);
+	if (!$user) {
+		throw new InvalidParameterException('registration:usernamenotvalid');
+	}
+	
+	$thewire = get_entity($wireid);
+
+	if ($thewire->getSubtype() == "thewire" && $thewire->canEdit($user->guid)) {
+		$children = elgg_get_entities_from_relationship(array(
+			'relationship' => 'parent',
+			'relationship_guid' => $wireid,
+			'inverse_relationship' => true,
+		));
+		if ($children) {
+			foreach ($children as $child) {
+				$child->reply = false;
+			}
+		}
+		$rowsaffected = $thewire->delete();
+		if ($rowsaffected > 0) {
+			return elgg_echo("thewire:deleted");
+		} else {
+			return elgg_echo("thewire:notdeleted");
+		}
+	}
+	else {
+		return elgg_echo("thewire:notdeleted");
+	}
+} 
+				
+expose_function('wire.delete',
+				"rest_wire_delete",
+				array('username' => array ('type' => 'string'),
+						'wireid' => array ('type' => 'int'),
+					),
+				"Delete a wire post",
+				'POST',
+				true,
+				false);
