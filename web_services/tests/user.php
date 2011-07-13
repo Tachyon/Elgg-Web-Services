@@ -47,4 +47,14 @@ class ElggWebServicesUserTest extends ElggCoreUnitTest {
 			$this->assertEqual($results->$key->type, $type);
 		}
 	}
+	
+	public function testGetProfile() {
+		$params = array('username' => 'admin');	
+		$results = $this->client->get('user.getprofile', $params);
+		$user = get_user_by_username('admin');
+		$user_fields = elgg_get_config('profile_fields');
+		foreach ($user_fields as $key => $type) {
+			$this->assertEqual($results->$key, $user->$key);
+		}
+	}
 }
