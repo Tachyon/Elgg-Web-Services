@@ -86,3 +86,24 @@ expose_function('likes.delete',
 				true,
 				false);
 				
+/**
+ * Web service to count number of likes
+ *
+ * @param string $entity_guid guid of object 
+ *
+ * @return bool
+ */
+function rest_likes_count($entity_guid) {
+	$entity = get_entity($entity_guid);
+	return likes_count($entity);
+} 
+				
+expose_function('likes.count',
+				"rest_likes_count",
+				array('entity_guid' => array ('type' => 'int'),
+					),
+				"Count number of likes",
+				'GET',
+				false,
+				false);
+				
