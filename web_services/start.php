@@ -8,13 +8,13 @@
  */
 function web_services_init() {
 	$action_base = elgg_get_plugins_path() . 'web_services/actions';
-	elgg_register_action('web_services/settings/save', "$action_base/save.php", "admin");
+	elgg_register_action('settings/web_services/save', "$action_base/save.php", "admin");
 	elgg_register_action('web_services/run_tests', "$action_base/web_services/run_tests.php", "admin");
 
 	elgg_register_admin_menu_item('develop', 'web_services', 'utilities');
 
 	// register with a low priority so that we can replace all unit tests
-	elgg_register_plugin_hook_handler('unit_test', 'system', 'web_services_test', 1000);
+	elgg_register_plugin_hook_handler('unit_test', 'system', 'web_services_test');
 	elgg_register_admin_menu_item('administer', 'web_services', 'utilities');
 }
 
@@ -35,25 +35,20 @@ foreach($enabled as $service) {
  * @param type  $type
  * @return array
  */
-function web_services_test($hook, $type) {
+function web_services_test($hook, $type, $value, $params) {
+	$enabled = unserialize(elgg_get_plugin_setting('enabled_webservices', 'web_services'));
 
-	if (elgg_in_context('web_services')) {
+	$base = elgg_get_plugins_path() . 'web_services/tests';
 
-		$locations = array();
+	//foreach ($enabled as $service) {
+	//	$location[] = "$base/$service.php";
+	//}
 
-		$enabled = unserialize(elgg_get_plugin_setting('enabled_webservices', 'web_services'));
+	// right now just register user web services
+	$value[] = elgg_get_plugins_path() . 'web_services/tests/core.php';
+	$value[] = elgg_get_plugins_path() . 'web_services/tests/user.php';
 
-		$base = elgg_get_plugins_path() . 'web_services/tests';
-
-		//foreach ($enabled as $service) {
-		//	$location[] = "$base/$service.php";
-		//}
-
-		// right now just register user web services
-		$location[] = elgg_get_plugins_path() . 'web_services/tests/core.php';
-
-		return $location;
-	}
+	return $value;
 }
 
 
