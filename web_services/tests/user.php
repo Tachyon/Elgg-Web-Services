@@ -12,6 +12,13 @@ class ElggWebServicesUserTest extends ElggCoreUnitTest {
 		parent::__construct();
 		$this->user = new ElggUser();
 		$this->user->username = 'test_username_' . rand(); 
+		$this->user->email = 'test@test.org';
+		$this->user->name = 'I am a Test User';
+		$this->user->access_id = ACCESS_PUBLIC;
+		$this->user->salt = generate_random_cleartext_password(); 
+		$this->user->password = generate_user_password($this->user, "pass123");
+		$this->user->save();
+		$this->user->makeAdmin();
 		// all __construct() code should come after here
 	}
 
@@ -20,10 +27,10 @@ class ElggWebServicesUserTest extends ElggCoreUnitTest {
 	 */
 	public function setUp() {
 		$this->client = new ElggApiClient(elgg_get_site_url(), '2dcbe06b8318d8b3ea72523f7135ae6edfcc75c1');
-		//$result = $this->client->obtainAuthToken('unittest', 'unittest');
-		//if (!$result) {
-		//   echo "Error in getting auth token!\n";
-		//}
+		$result = $this->client->obtainAuthToken($this->user->username, 'pass123');
+		if (!$result) {
+		   echo "Error in getting auth token!\n";
+		}
 	}
 
 	/**
@@ -56,7 +63,6 @@ class ElggWebServicesUserTest extends ElggCoreUnitTest {
 	}
 	
 	public function testUpdateProfile() {
-	
 		$profile = array('description' => 'description test',
 						'briefdescription' => 'briefdescription test',
 						'location' => 'India',
