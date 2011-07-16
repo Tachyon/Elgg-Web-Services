@@ -6,8 +6,31 @@ List of Web Services
 
 ### Core
 
- * site.test     Heartbeat method to test whether web services are up
- * site.get_info Get basic information about this Elgg site
+ * site.test - Heartbeat method to test whether web services are up
+
+	```
+	$info = $client->get('site.test');
+	var_dump($info);
+	```
+
+	```
+	string 'Hello' (length=5)
+	```
+
+ * site.get_info - Get basic information about this Elgg site
+
+	```
+	$info = $client->get('site.getinfo');
+	var_dump($info);
+	```
+
+	```
+	object(stdClass)[135]
+		public 'url' => string 'http://elgg-master.mbp/Users/brett/Devel/elgg/master' (length=52)
+		public 'sitename' => string 'New Elgg site' (length=13)
+		public 'language' => string 'en' (length=2)
+	```
+
 
 ### User
 
