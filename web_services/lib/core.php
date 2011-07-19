@@ -13,9 +13,9 @@
  * @return string $response Hello
  */
 function rest_site_test() {
-		$response = "Hello";
-		return $response;
-	} 
+	$response = "Hello";
+	return $response;
+} 
 
 expose_function('site.test',
 				"rest_site_test",
@@ -33,11 +33,14 @@ expose_function('site.test',
  * @return string $language Language of Elgg website
  */
 function rest_site_getinfo() {
-		$siteinfo['url'] = elgg_get_config('www_root');
-		$siteinfo['sitename'] = elgg_get_config('site_name');
-		$siteinfo['language'] = elgg_get_config('language');
-		return $siteinfo;
-	} 
+	$site = elgg_get_config('site');
+
+	$siteinfo['url'] = elgg_get_site_url();
+	$siteinfo['sitename'] = $site->name;
+	$siteinfo['language'] = elgg_get_config('language');
+	
+	return $siteinfo;
+} 
 
 expose_function('site.getinfo',
 				"rest_site_getinfo",
