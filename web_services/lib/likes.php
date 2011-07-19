@@ -107,3 +107,31 @@ expose_function('likes.count',
 				false,
 				false);
 				
+/**
+ * Web service to get users who liked an entity
+ *
+ * @param string $entity_guid guid of object 
+ *
+ * @return bool
+ */
+function rest_likes_getusers($entity_guid) {
+	$entity = get_entity($entity_guid);
+	$list = elgg_get_annotations(array('guid' => $entity_guid, 'annotation_name' => 'likes', 'limit' => 99));
+	foreach($list as $singlelike) {
+		$likes[$singlelike->id]['userid'] = $singlelike->owner_guid;
+		$likes[$singlelike->id]['time_created'] = $singlelike->time_created;
+		$likes[$singlelike->id]['access_id'] = $singlelike->access_id;
+	}
+	return $likes;
+}
+
+				
+expose_function('likes.getusers',
+				"rest_likes_getusers",
+				array('entity_guid' => array ('type' => 'int'),
+					),
+				"Get users who liked an entity",
+				'GET',
+				false,
+				false);
+				
