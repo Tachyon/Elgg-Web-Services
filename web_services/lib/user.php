@@ -21,7 +21,7 @@ function rest_user_getprofilelabels() {
 	return $profile_labels;
 }
 	
-expose_function('user.profilelabels',
+expose_function('user.get_profile_fields',
 				"rest_user_getprofilelabels",
 				array(),
 				"Get user profile labels",
@@ -48,7 +48,15 @@ function rest_user_getprofile($username) {
 	}
 	return $user_fields;
 }
-	
+
+expose_function('user.get_profile',
+				"rest_user_getprofile",
+				array('username' => array ('type' => 'string')
+					),
+				"Get user profile labels",
+				'GET',
+				false,
+				false);
 /**
  * Web service to update profile information
  *
@@ -119,7 +127,7 @@ function rest_user_updateprofile($username, $profile) {
 	return "Success";
 }
 	
-expose_function('user.updateprofile',
+expose_function('user.save_profile',
 				"rest_user_updateprofile",
 				array('username' => array ('type' => 'string'),
 					 'profile' => array ('type' => 'array'),
@@ -151,7 +159,7 @@ function rest_user_getbyemail($email) {
 	return $foundusers;
 }
 
-expose_function('user.getbyemail',
+expose_function('user.get_user_by_email',
 				"rest_user_getbyemail",
 				array('email' => array ('type' => 'string'),
 					),
@@ -176,7 +184,7 @@ function rest_user_checkailability($username) {
 	}
 }
 
-expose_function('user.checkavail',
+expose_function('user.check_username_availability',
 				"rest_user_checkailability",
 				array('username' => array ('type' => 'string'),
 					),
@@ -198,10 +206,13 @@ expose_function('user.checkavail',
 function rest_user_register($name, $email, $username, $password) {
 	$user = get_user_by_username($username);
 	if (!$user) {
-		return register_user($username, $password, $name, $email);
+		$return['success'] = true;
+		$return['guid'] = register_user($username, $password, $name, $email);
 	} else {
-		throw new InvalidParameterException('registration:userexists');
+		$return['success'] = false;
+		$return['message'] = elgg_echo('registration:userexists');
 	}
+	return $return;
 }
 
 expose_function('user.register',
@@ -226,17 +237,18 @@ expose_function('user.register',
  */           
 function rest_user_addfriend($username, $friend) {
 	$user = get_user_by_username($username);
+	$return['success'] = false;
 	if (!$user) {
-		throw new InvalidParameterException(elgg_echo('registration:usernamenotvalid'));
+		$return['message'] = elgg_echo('registration:usernamenotvalid');
 	}
 	
 	$friend_user = get_user_by_username($friend);
 	if (!$friend_user) {
-		throw new InvalidParameterException(elgg_echo("friends:add:failure", array($friend_user->name)));
+		$return['message'] = elgg_echo("friends:add:failure", array($friend_user->name));
 	}
 	
 	if($friend_user->isFriendOf($user->guid)) {
-		throw new InvalidParameterException(elgg_echo('friends:alreadyadded', array($friend_user->name)));
+		$return['message'] = elgg_echo('friends:alreadyadded', array($friend_user->name));
 	}
 	
 	try {
@@ -246,24 +258,25 @@ function rest_user_addfriend($username, $friend) {
 		
 	} catch (Exception $e) {
 		$errors = true;
-		throw new InvalidParameterException(elgg_echo("friends:add:failure", array($friend_user->name)));
+		$return['message'] = elgg_echo("friends:add:failure", array($friend_user->name));
 	}
 
 	if (!$errors) {
 		// add to river
 		add_to_river('river/relationship/friend/create', 'friend', $user->guid, $friend_user->guid);
-		return true;
+		$return['success'] = true;
+		$return['message'] = elgg_echo('friends:add:successful' , array($friend_user->name));
 	}
+	return $return;
 }
 
-expose_function('user.addfriend',
+expose_function('user.friend.add',
 				"rest_user_addfriend",
 				array('username' => array ('type' => 'string'),
-						'password' => array ('type' => 'string'),
 						'friend' => array ('type' => 'string'),
 					),
-				"Register user",
-				'GET',
+				"Add a user as friend",
+				'POST',
 				true,
 				false);	
 				
@@ -278,17 +291,18 @@ expose_function('user.addfriend',
  */           
 function rest_user_removefriend($username, $friend) {
 	$user = get_user_by_username($username);
+	$return['success'] = false;
 	if (!$user) {
-		throw new InvalidParameterException(elgg_echo('registration:usernamenotvalid'));
+		$return['message'] = elgg_echo('registration:usernamenotvalid');
 	}
 	
 	$friend_user = get_user_by_username($friend);
 	if (!$friend_user) {
-		throw new InvalidParameterException(elgg_echo("friends:remove:failure", array($friend_user->name)));
+		$return['message'] = elgg_echo("friends:remove:failure", array($friend_user->name));
 	}
 	
 	if(!$friend_user->isFriendOf($user->guid)) {
-		throw new InvalidParameterException(elgg_echo('friends:remove:notfriend', array($friend_user->name)));
+		$return['message'] = elgg_echo('friends:remove:notfriend', array($friend_user->name));
 	}
 	
 	try {
@@ -297,23 +311,23 @@ function rest_user_removefriend($username, $friend) {
 		}
 	} catch (Exception $e) {
 		$errors = true;
-		throw new InvalidParameterException(elgg_echo("friends:remove:failure", array($friend_user->name)));
+		$return['message'] = elgg_echo("friends:remove:failure", array($friend_user->name));
 	}
 
 	if (!$errors) {
-		system_message(elgg_echo("friends:remove:successful", array($friend->name)));
-		return true;
+		$return['message'] = elgg_echo("friends:remove:successful", array($friend->name));
+		$return['success'] = true;
 	}
+	return $return;
 }
 
-expose_function('user.removefriend',
+expose_function('user.friend.remove',
 				"rest_user_removefriend",
 				array('username' => array ('type' => 'string'),
-						'password' => array ('type' => 'string'),
 						'friend' => array ('type' => 'string'),
 					),
-				"Register user",
-				'GET',
+				"Remove friend",
+				'POST',
 				true,
 				false);				
 				
@@ -333,14 +347,21 @@ function rest_user_getfriend($username, $limit = 10, $offset = 0) {
 	}
 	$friends = get_user_friends($user->guid, '' , $limit, $offset);
 
-	$return = array();
+	$return['success'] = false;
+	$count = 0;
 	foreach($friends as $friend) {
-		$return[$friend->username] = $friend->name;
+		$return['success'] = true;
+		$return['friends'][$count]['username'] = $friend->username;
+		$return['friends'][$count++]['name'] = $friend->name;
+	}
+	
+	if(!$return['success']) {
+		$return['message'] = elgg_echo('friends:none');
 	}
 	return $return;
 }
 
-expose_function('user.getfriend',
+expose_function('user.friend.get_friends',
 				"rest_user_getfriend",
 				array('username' => array ('type' => 'string', 'required' => true),
 						'limit' => array ('type' => 'int', 'required' => false),
@@ -366,15 +387,22 @@ function rest_user_getfriendof($username, $limit = 10, $offset = 0) {
 		throw new InvalidParameterException(elgg_echo('registration:usernamenotvalid'));
 	}
 	$friends = get_user_friends_of($user->guid, '' , $limit, $offset);
-
-	$return = array();
+	
+	$return['success'] = false;
+	$count = 0;
 	foreach($friends as $friend) {
-		$return[$friend->username] = $friend->name;
+		$return['success'] = true;
+		$return['friends'][$count]['username'] = $friend->username;
+		$return['friends'][$count++]['name'] = $friend->name;
+	}
+	
+	if(!$return['success']) {
+		$return['message'] = elgg_echo('friends:none');
 	}
 	return $return;
 }
 
-expose_function('user.getfriendof',
+expose_function('user.friend.get_friends_of',
 				"rest_user_getfriendof",
 				array('username' => array ('type' => 'string', 'required' => true),
 						'limit' => array ('type' => 'int', 'required' => false),
