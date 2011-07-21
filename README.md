@@ -14,7 +14,9 @@ List of Web Services
 	```
 
 	```
-	string 'Hello' (length=5)
+	object(stdClass)
+		public 'success' => boolean true
+		public 'message' => string 'Hello' (length=5)
 	```
 
  * site.get_info - Get basic information about this Elgg site
@@ -170,7 +172,9 @@ List of Web Services
 	```
 	
 	```
-	int 8654
+	object(stdClass)
+		boolean success true
+		int guid 8654
 	```
 	
  * user.friend.add                  Add a user as a friend
@@ -179,12 +183,14 @@ List of Web Services
 	$params = array('username' => array ('type' => 'string'),
 					'friend' => array ('type' => 'string'),
 					);	
-	$info = $this->client->get('user.friend.add', $params);
+	$info = $this->client->post('user.friend.add', $params);
 	var_dump($info);
 	```
 	
 	```
-	boolean true
+	object(stdClass)
+		boolean success true
+		string message 'Successfully Added'
 	```
 	
  * user.friend.remove               Remove a user from friend
@@ -193,12 +199,14 @@ List of Web Services
 	$params = array('username' => array ('type' => 'string'),
 					'friend' => array ('type' => 'string'),
 					);	
-	$info = $this->client->get('user.friend.remove', $params);
+	$info = $this->client->post('user.friend.remove', $params);
 	var_dump($info);
 	```
 	
 	```
-	boolean true
+	object(stdClass)
+		boolean success true
+		string message 'Successfully Removed'
 	```
 	
  * user.friend.get_friends          Get friends of a user
@@ -214,7 +222,13 @@ List of Web Services
 	
 	```
 	object(stdClass)[3]
-		public 'tachyon' => string 'Saket Saurabh' (length=13)
+  public 'success' => boolean true
+  public 'friends' => 
+    array
+      0 => 
+        object(stdClass)[4]
+          public 'username' => string 'tachyon' (length=7)
+          public 'name' => string 'Saket Saurabh' (length=13)
 	```
 	
  * user.friend.get_friends_of       Obtains the people who have made a given user a friend
@@ -247,7 +261,9 @@ List of Web Services
 	```
 	
 	```
-	boolean true 
+	object(stdClass)
+		public 'success' => boolean true
+		public 'message' => string 'Successfully saved the blog post.' (length=33)
 	```
 	
  * blog.get_post          Read a blog post
@@ -283,7 +299,9 @@ List of Web Services
 	```
 	
 	```
-	string 'Blog post deleted.' (length=18)
+	object(stdClass)
+		public 'success' => boolean true
+		public 'message' => string 'Blog post deleted.' (length=18)
 	```
 	
  * blog.get_friends_posts  Get latest blog post by friends
@@ -351,7 +369,9 @@ List of Web Services
 	```
 	
 	```
-	string 'Successfully joined group!' (length=26)  
+	object(stdClass)
+		public 'success' => boolean true
+		public 'message' => string 'Successfully joined group!' (length=26)  
 	```
 	
  * group.leave                 Leaving a group
@@ -365,7 +385,9 @@ List of Web Services
 	```
 	
 	```
-	string 'Successfully left group' (length=23)
+	object(stdClass)
+		public 'success' => boolean true
+		public 'message' => string 'Successfully left group' (length=23)
 	```
 	
  * group.forum.save_post       Posting a new topic to a group
@@ -381,7 +403,9 @@ List of Web Services
 	```
 	
 	```
-	string 'The discussion topic was created.' (length=33)
+	object(stdClass)
+		public 'success' => boolean true
+		public 'message' => string 'The discussion topic was created.' (length=33)
 	```
 	
  * group.forum.delete_post     Deleting a topic from a group
@@ -395,7 +419,9 @@ List of Web Services
 	```
 	
 	```
-	string 'Discussion topic has been deleted.' (length=34)
+	object(stdClass)
+		public 'success' => boolean true
+		public 'message' => string 'Discussion topic has been deleted.' (length=34)
 	```
 	
  * group.forum.get_latest_post Get latest post in a group
@@ -462,7 +488,9 @@ List of Web Services
 	```
 	
 	```
-	boolean true
+	object(stdClass)
+		public 'success' => boolean true
+		public 'message' => string 'Successfully posted reply' (length=25)
 	```
 	
  * group.forum.delete_reply    Delete a reply
@@ -476,7 +504,9 @@ List of Web Services
 	```
 	
 	```
-	string 'Discussion reply has been deleted.' (length=34)
+	object(stdClass)
+		public 'success' => boolean true
+		public 'message' => string 'Discussion reply has been deleted.' (length=34)
 	```
 
 ### Wire
@@ -492,7 +522,9 @@ List of Web Services
 	```
 	
 	```
-	boolean true
+	object(stdClass)
+		public 'success' => boolean true
+		public 'message' => string 'succesfully saved' (length=17)
 	```
 	
  * wire.get_post         Read latest wire post of user
@@ -541,7 +573,9 @@ List of Web Services
 	```
 	
 	```
-	string 'The wire post was successfully deleted.' (length=39)
+	object(stdClass)
+		public 'success' => boolean true
+		public 'message' => string 'The wire post was successfully deleted.' (length=39)
 	```
  
 ### File
@@ -605,7 +639,9 @@ List of Web Services
 	```
 	
 	```
-	string 'You now like this item' (length=22)
+	object(stdClass)
+		public 'success' => boolean true
+		public 'message' => string 'You now like this item' (length=22)
 	```
 	
  * likes.delete Unlike an entity
@@ -618,7 +654,9 @@ List of Web Services
 	```
 	
 	```
-	string 'Your like has been removed' (length=26)
+	object(stdClass)
+		public 'success' => boolean true
+		public 'message' =>	string 'Your like has been removed' (length=26)
 	```
 	
  * likes.count Number of likes to an entity
