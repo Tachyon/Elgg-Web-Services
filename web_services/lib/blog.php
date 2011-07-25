@@ -19,7 +19,7 @@
  *
  * @return bool
  */
-function rest_blog_post($username, $title, $text, $excerpt = "", $tags = "blog" , $access = ACCESS_PUBLIC) {
+function rest_blog_save($username, $title, $text, $excerpt = "", $tags = "blog" , $access = ACCESS_PUBLIC) {
 	$user = get_user_by_username($username);
 	if (!$user) {
 		throw new InvalidParameterException('registration:usernamenotvalid');
@@ -42,12 +42,13 @@ function rest_blog_post($username, $title, $text, $excerpt = "", $tags = "blog" 
 	$user->guid,
 	$obj->guid
 	);
-
-	return "success";
+	$return['success'] = true;
+	$return['message'] = elgg_echo('blog:message:saved');
+	return $return;
 	} 
 	
-expose_function('blog.post',
-				"rest_blog_post",
+expose_function('blog.save_post',
+				"rest_blog_save",
 				array('username' => array ('type' => 'string', 'required' => true),
 						'title' => array ('type' => 'string', 'required' => true),
 						'text' => array ('type' => 'string', 'required' => true),
@@ -76,7 +77,7 @@ expose_function('blog.post',
  * @return string $status      (Published/Draft)
  * @return string $comments_on On/Off
  */
-function rest_blog_read($guid, $username) {
+function rest_blog_get_post($guid, $username) {
 	$return = array();
 	$blog = get_entity($guid);
 
@@ -114,8 +115,8 @@ function rest_blog_read($guid, $username) {
 	return $return;
 }
 	
-expose_function('blog.read',
-				"rest_blog_read",
+expose_function('blog.get_post',
+				"rest_blog_get_post",
 				array('guid' => array ('type' => 'string'),
 						'username' => array ('type' => 'string'),
 					),
@@ -133,13 +134,12 @@ expose_function('blog.read',
  *
  * @return bool
  */
-function rest_blog_delete($guid, $username) {
+function rest_blog_delete_post($guid, $username) {
 	$return = array();
 	$blog = get_entity($guid);
-
+	$return['success'] = false;
 	if (!elgg_instanceof($blog, 'object', 'blog')) {
-		$return['content'] = elgg_echo('blog:error:post_not_found');
-		return $return;
+		throw new InvalidParameterException('blog:error:post_not_found');
 	}
 	
 	$user = get_user_by_username($username);
@@ -148,37 +148,39 @@ function rest_blog_delete($guid, $username) {
 	}
 	$blog = get_entity($guid);
 	if($user->guid!=$blog->owner_guid) {
-		return elgg_echo('blog:message:notauthorized');
+		$return['message'] = elgg_echo('blog:message:notauthorized');
 	}
 
 	if (elgg_instanceof($blog, 'object', 'blog') && $blog->canEdit()) {
 		$container = get_entity($blog->container_guid);
 		if ($blog->delete()) {
-			return elgg_echo('blog:message:deleted_post');
+			$return['success'] = true;
+			$return['message'] = elgg_echo('blog:message:deleted_post');
 		} else {
-			return elgg_echo('blog:error:cannot_delete_post');
+			$return['message'] = elgg_echo('blog:error:cannot_delete_post');
 		}
 	} else {
-		return elgg_echo('blog:error:post_not_found');
+		$return['message'] = elgg_echo('blog:error:post_not_found');
 	}
+	
+	return $return;
 }
 	
-expose_function('blog.delete',
-				"rest_blog_delete",
+expose_function('blog.delete_post',
+				"rest_blog_delete_post",
 				array('guid' => array ('type' => 'string'),
 						'username' => array ('type' => 'string'),
 					),
 				"Read a blog post",
-				'GET',
+				'POST',
 				true,
 				false);
 
 								
 /**
- * Web service for read latest wire post by friends
+ * Web service for read latest blog post by friends
  *
  * @param string $username username
- * @param string $password password
  * @param string $limit    number of results to display
  * @param string $offset   offset of list
  *
@@ -192,13 +194,13 @@ expose_function('blog.delete',
  * @return string $status       (Published/Draft)
  * @return string $comments_on  On/Off
  */
-function rest_blog_friend($username, $limit = 10, $offset = 0) {
+function rest_blog_get_friends_posts($username, $limit = 10, $offset = 0) {
 	$user = get_user_by_username($username);
 	if (!$user) {
 		throw new InvalidParameterException('registration:usernamenotvalid');
 	}
-
-	$posts = get_user_friends_objects($user->guid, 'blog', $limit = 10, $offset = 0);
+	
+	$posts = get_user_friends_objects($user->guid, 'blog', $limit, $offset);
 	if($posts) {
 		foreach($posts as $single ) {
 			$blog[$single->guid]['time_created'] = $single->time_created;
@@ -212,25 +214,24 @@ function rest_blog_friend($username, $limit = 10, $offset = 0) {
 			$blog[$single->guid]['comments_on'] = $single->comments_on;
 		}
 	} else {
-		$blog = elgg_echo("blog:message:noposts");
+		$blog['error']['message'] = elgg_echo("blog:message:noposts");
 	}
 	return $blog;
 	} 
 				
-expose_function('blog.friend',
-				"rest_blog_friend",
+expose_function('blog.get_friends_posts',
+				"rest_blog_get_friends_posts",
 				array('username' => array ('type' => 'string'),
-						'password' => array ('type' => 'string'),
 						'limit' => array ('type' => 'int', 'required' => false),
 						'offset' => array ('type' => 'int', 'required' => false),
 					),
-				"Read lates wire post",
+				"get latest bolg posts by friends",
 				'GET',
 				true,
 				false);
 				
 /**
- * Web service for read latest wire post by friends
+ * Web service to get latest blog post by a user
  *
  * @param string $username username
  * @param string $limit    number of results to display
@@ -246,22 +247,33 @@ expose_function('blog.friend',
  * @return string $status       (Published/Draft)
  * @return string $comments_on  On/Off
  */
-function rest_blog_user($username, $limit = 10, $offset = 0) {
-	$user = get_user_by_username($username);
-	if (!$user) {
-		throw new InvalidParameterException('registration:usernamenotvalid');
+function rest_blog_get_latest_posts($username = NULL, $limit = 10, $offset = 0) {
+	if($username) {
+		$user = get_user_by_username($username);
+		if (!$user) {
+			throw new InvalidParameterException('registration:usernamenotvalid');
+		}
+		$posts = elgg_get_entities(array(
+				'type' => 'object',
+				'subtype' => 'blog',
+				'owner_guids' => $user->guid,
+				'limit' => $limit,
+				'offset' => $offset,
+				'container_guids' => $$user->guid,
+				'created_time_lower' => 0,
+				'created_time_upper' => 0
+			));
+	} else {
+		$posts = elgg_get_entities(array(
+				'type' => 'object',
+				'subtype' => 'blog',
+				'limit' => $limit,
+				'offset' => $offset,
+				'container_guids' => $$user->guid,
+				'created_time_lower' => 0,
+				'created_time_upper' => 0
+			));
 	}
-	
-	$posts = elgg_get_entities(array(
-			'type' => 'object',
-			'subtype' => 'blog',
-			'owner_guids' => $user->guid,
-			'limit' => $limit,
-			'offset' => $offset,
-			'container_guids' => $$user->guid,
-			'created_time_lower' => 0,
-			'created_time_upper' => 0
-		));
 	
 	if($posts) {
 		foreach($posts as $single ) {
@@ -276,14 +288,14 @@ function rest_blog_user($username, $limit = 10, $offset = 0) {
 			$blog[$single->guid]['comments_on'] = $single->comments_on;
 		}
 	} else {
-		$blog = elgg_echo("blog:message:noposts");
+		$blog['error']['message'] = elgg_echo("blog:message:noposts");
 	}
 	return $blog;
 	} 
 				
-expose_function('blog.user',
-				"rest_blog_user",
-				array('username' => array ('type' => 'string'),
+expose_function('blog.get_latest_posts',
+				"rest_blog_get_latest_posts",
+				array('username' => array ('type' => 'string', 'required' => false),
 						'limit' => array ('type' => 'int', 'required' => false),
 						'offset' => array ('type' => 'int', 'required' => false),
 					),
