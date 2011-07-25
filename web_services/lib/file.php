@@ -51,7 +51,7 @@ expose_function('file.all',
 				false);
 				
 /**
- * Web service to get file list by all users
+ * Web service to get file list by friends
  *
  * @param string $username  username
  * @param string $limit     (optional) default 10
