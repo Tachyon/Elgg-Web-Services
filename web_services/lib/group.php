@@ -15,14 +15,14 @@
  *
  * @return bool
  */
-function rest_group_join($username, $groupid, $password) {
+function rest_group_join($username, $groupid) {
 	$user = get_user_by_username($username);
 	if (!$user) {
 		throw new InvalidParameterException('registration:usernamenotvalid');
 	}
 	
 	$group = get_entity($groupid);
-	
+	$return['success'] = false;
 	if (($user instanceof ElggUser) && ($group instanceof ElggGroup)) {
 		// join or request
 		$join = false;
@@ -38,9 +38,10 @@ function rest_group_join($username, $groupid, $password) {
 
 		if ($join) {
 			if (groups_join_group($group, $user)) {
-				return elgg_echo("groups:joined");
+				$return['success'] = true;
+				$return['message'] = elgg_echo("groups:joined");
 			} else {
-				return elgg_echo("groups:cantjoin");
+				$return['message'] = elgg_echo("groups:cantjoin");
 			}
 		} else {
 			add_entity_relationship($user->guid, 'membership_request', $group->guid);
@@ -59,14 +60,16 @@ function rest_group_join($username, $groupid, $password) {
 				$url,
 			));
 			if (notify_user($group->owner_guid, $user->getGUID(), $subject, $body)) {
-				return elgg_echo("groups:joinrequestmade");
+				$return['success'] = true;
+				$return['message'] = elgg_echo("groups:joinrequestmade");
 			} else {
-				return elgg_echo("groups:joinrequestnotmade");
+				$return['message'] = elgg_echo("groups:joinrequestnotmade");
 			}
 		}
 	} else {
-		return elgg_echo("groups:cantjoin");
+		$return['message'] = elgg_echo("groups:cantjoin");
 	}
+	return $return;
 } 
 				
 expose_function('group.join',
@@ -75,7 +78,7 @@ expose_function('group.join',
 						'groupid' => array ('type' => 'string'),
 					),
 				"Join a group",
-				'GET',
+				'POST',
 				true,
 				false);
 				
@@ -94,21 +97,23 @@ function rest_group_leave($username, $groupid) {
 	}
 	
 	$group = get_entity($groupid);
-	
+	$return['success'] = false;
 	set_page_owner($group->guid);
 	if (($user instanceof ElggUser) && ($group instanceof ElggGroup)) {
 		if ($group->getOwnerGUID() != elgg_get_logged_in_user_guid()) {
 			if ($group->leave($user)) {
-				return elgg_echo("groups:left");
+				$return['success'] = true;
+				$return['message'] = elgg_echo("groups:left");
 			} else {
-				return elgg_echo("groups:cantleave");
+				$return['message'] = elgg_echo("groups:cantleave");
 			}
 		} else {
-			return elgg_echo("groups:cantleave");
+			$return['message'] = elgg_echo("groups:cantleave");
 		}
 	} else {
-		return elgg_echo("groups:cantleave");
+		$return['message'] = elgg_echo("groups:cantleave");
 	}
+	return $return;
 } 
 				
 expose_function('group.leave',
@@ -117,7 +122,7 @@ expose_function('group.leave',
 						'groupid' => array ('type' => 'string'),
 					),
 				"leave a group",
-				'GET',
+				'POST',
 				true,
 				false);
 				
@@ -133,19 +138,19 @@ expose_function('group.leave',
  *
  * @return bool
  */
-function rest_group_post($username, $groupid, $title, $desc, $tags = "", $status = "published", $access_id = ACCESS_DEFAULT) {
+function rest_group_forum_save_post($username, $groupid, $title, $desc, $tags = "", $status = "published", $access_id = ACCESS_DEFAULT) {
 	$user = get_user_by_username($username);
 	if (!$user) {
 		throw new InvalidParameterException('registration:usernamenotvalid');
 	}
 	$group = get_entity($groupid);
 	if (!$group) {
-		return elgg_echo('group:notfound');
+		throw new InvalidParameterException('group:notfound');
 	}
-
+	$return['success'] = false;
 	// make sure user has permissions to write to container
 	if (!can_write_to_container($user->guid, $groupid, "all", "all")) {
-		return elgg_echo('groups:permissions:error');
+		$return['message'] = elgg_echo('groups:permissions:error');
 	}
 	
 	$topic = new ElggObject();
@@ -163,13 +168,16 @@ function rest_group_post($username, $groupid, $title, $desc, $tags = "", $status
 	$result = $topic->save();
 
 	if (!$result) {
-		return elgg_echo('discussion:error:notsaved');
+		$return['message'] = elgg_echo('discussion:error:notsaved');
+	} else {
+		$return['success'] = true;
+		$return['message'] = elgg_echo('discussion:topic:created');
 	}
-	return elgg_echo('discussion:topic:created');
+	return $return;
 } 
 				
-expose_function('group.post',
-				"rest_group_post",
+expose_function('group.forum.save_post',
+				"rest_group_forum_save_post",
 				array('username' => array ('type' => 'string'),
 						'groupid' => array ('type' => 'int'),
 						'title' => array ('type' => 'string'),
@@ -184,40 +192,46 @@ expose_function('group.post',
 				false);
 				
 /**
- * Web service for posting a new topic to a group
+ * Web service for deleting a topic from a group
  *
  * @param string $username username of author
  * @param string $topicid  Topic ID
  *
  * @return bool
  */
-function rest_group_deletepost($username, $topicid) {
+function rest_group_forum_delete_post($username, $topicid) {
 	$topic = get_entity($topicid);
+	
+	$return['success'] = false;
 	if (!$topic || !$topic->getSubtype() == "groupforumtopic") {
-		return elgg_echo('discussion:error:notdeleted');
+		$return['message'] = elgg_echo('discussion:error:notdeleted');
+		return $return;
 	}
 
 	$user = get_user_by_username($username);
 	if (!$user) {
-		return elgg_echo('registration:usernamenotvalid');
+		$return['message'] = elgg_echo('registration:usernamenotvalid');
+		return $return;
 	}
 
 	if (!$topic->canEdit($user->guid)) {
-		return elgg_echo('discussion:error:permissions');
+		$return['message'] = elgg_echo('discussion:error:permissions');
 	}
 
 	$container = $topic->getContainerEntity();
 
 	$result = $topic->delete();
 	if ($result) {
-		return elgg_echo('discussion:topic:deleted');
+		$return['success'] = true;
+		$return['message'] = elgg_echo('discussion:topic:deleted');
 	} else {
-		return elgg_echo('discussion:error:notdeleted');
+		$return['message'] = elgg_echo('discussion:error:notdeleted');
 	}
+	return $return;
 } 
 				
-expose_function('group.deletepost',
-				"rest_group_deletepost",
+expose_function('group.forum.delete_post',
+				"rest_group_forum_delete_post",
 				array('username' => array ('type' => 'string'),
 						'topicid' => array ('type' => 'int'),
 					),
@@ -235,7 +249,7 @@ expose_function('group.deletepost',
  *
  * @return bool
  */
-function rest_group_latest($groupid, $limit = 10, $offset = 0) {
+function rest_group_forum_latest_post($groupid, $limit = 10, $offset = 0) {
 	$group = get_entity($groupid);
 	if (!$group) {
 		return elgg_echo('group:notfound');
@@ -269,8 +283,8 @@ function rest_group_latest($groupid, $limit = 10, $offset = 0) {
 	return $post;
 } 
 				
-expose_function('group.latest',
-				"rest_group_latest",
+expose_function('group.forum.get_latest_post',
+				"rest_group_forum_latest_post",
 				array('groupid' => array ('type' => 'string'),
 					  'limit' => array ('type' => 'int', 'required' => false),
 					  'offset' => array ('type' => 'int', 'required' => false),
@@ -289,7 +303,7 @@ expose_function('group.latest',
  *
  * @return bool
  */
-function rest_group_getreplies($postid, $limit = 10, $offset = 0) {
+function rest_group_forum_get_reply($postid, $limit = 10, $offset = 0) {
 	$group = get_entity($postid);
 	$options = array(
 		'guid' => $postid,
@@ -318,8 +332,8 @@ function rest_group_getreplies($postid, $limit = 10, $offset = 0) {
 	return $post;
 } 
 				
-expose_function('group.getreplies',
-				"rest_group_getreplies",
+expose_function('group.forum.get_reply',
+				"rest_group_forum_get_reply",
 				array('postid' => array ('type' => 'string'),
 					  'limit' => array ('type' => 'int', 'required' => false),
 					  'offset' => array ('type' => 'int', 'required' => false),
@@ -338,39 +352,45 @@ expose_function('group.getreplies',
  *
  * @return bool
  */
-function rest_group_reply($username, $postid, $text) {
+function rest_group_forum_save_reply($username, $postid, $text) {
 	$entity_guid = (int) get_input('entity_guid');
-
+	$return['success'] = false;
 	if (empty($text)) {
-		return elgg_echo('grouppost:nopost');
+		$return['message'] = elgg_echo('grouppost:nopost');
+		return $return;
 	}
 
 	$topic = get_entity($postid);
 	if (!$topic) {
-		return elgg_echo('grouppost:nopost');
+		$return['message'] = elgg_echo('grouppost:nopost');
+		return $return;
 	}
 
 	$user = get_user_by_username($username);
 	if (!$user) {
-		return elgg_echo('registration:usernamenotvalid');
+		$return['message'] = elgg_echo('registration:usernamenotvalid');
+		return $return;
 	}
 
 	$group = $topic->getContainerEntity();
 	if (!$group->canWriteToContainer($user)) {
-		return elgg_echo('groups:notmember');
+		$return['message'] = elgg_echo('groups:notmember');
+		return $return;
 	}
 
 	$reply_id = $topic->annotate('group_topic_post', $text, $topic->access_id, $user->guid);
 	if ($reply_id == false) {
-		return elgg_echo('groupspost:failure');
+		$return['message'] = elgg_echo('groupspost:failure');
+		return $return;
 	}
 	
 	add_to_river('river/annotation/group_topic_post/reply', 'reply', $user->guid, $topic->guid, "", 0, $reply_id);
-	return true;
+	$return['success'] = true;
+	return $return;
 } 
 				
-expose_function('group.reply',
-				"rest_group_reply",
+expose_function('group.forum.save_reply',
+				"rest_group_forum_save_reply",
 				array('username' => array ('type' => 'string'),
 						'postid' => array ('type' => 'string'),
 						'text' => array ('type' => 'string'),
@@ -381,38 +401,45 @@ expose_function('group.reply',
 				false);
 				
 /**
- * Web service post a reply
+ * Web service delete a reply
  *
  * @param string $username username
  * @param string $id       Annotation ID of reply
  *
  * @return bool
  */
-function rest_group_deletereply($username, $id) {
+function rest_group_forum_delete_reply($username, $id) {
 	$reply = elgg_get_annotation_from_id($id);
+	$return['success'] = false;
 	if (!$reply || $reply->name != 'group_topic_post') {
-		return elgg_echo('discussion:reply:error:notdeleted');
+		$return['message'] = elgg_echo('discussion:reply:error:notdeleted');
+		return $return;
 	}
 	
 	$user = get_user_by_username($username);
 	if (!$user) {
-		return elgg_echo('registration:usernamenotvalid');
+		$return['message'] = elgg_echo('registration:usernamenotvalid');
+		return $return;
 	}
 
 	if (!$reply->canEdit($user->guid)) {
-		return elgg_echo('discussion:error:permissions');
+		$return['message'] = elgg_echo('discussion:error:permissions');
+		return $return;
 	}
 
 	$result = $reply->delete();
 	if ($result) {
-		return elgg_echo('discussion:reply:deleted');
+		$return['success'] = true;
+		$return['message'] = elgg_echo('discussion:reply:deleted');
+		return $return;
 	} else {
-		return elgg_echo('discussion:reply:error:notdeleted');
+		$return['message'] = elgg_echo('discussion:reply:error:notdeleted');
+		return $return;
 	}
 } 
 				
-expose_function('group.deletereply',
-				"rest_group_deletereply",
+expose_function('group.forum.delete_reply',
+				"rest_group_forum_delete_reply",
 				array('username' => array ('type' => 'string'),
 						'id' => array ('type' => 'string'),
 					),
