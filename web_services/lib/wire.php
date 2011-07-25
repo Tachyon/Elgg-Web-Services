@@ -17,32 +17,34 @@
  *
  * @return bool
  */
-function rest_wire_post($username, $text, $access = ACCESS_PUBLIC) {
+function rest_wire_save_post($username, $text, $access = ACCESS_PUBLIC) {
 	$user = get_user_by_username($username);
 	if (!$user) {
 		throw new InvalidParameterException('registration:usernamenotvalid');
 	}
-	
+	$return['success'] = false;
 	if (empty($text)) {
-		return elgg_echo("thewire:blank");
+		$return['message'] = elgg_echo("thewire:blank");
+		return $return;
 	}
 	$access_id = strip_tags($access);
 	$guid = thewire_save_post($text, $user->guid, $access_id, "api");
 	if (!$guid) {
-		return elgg_echo("thewire:error");
+		$return['message'] = elgg_echo("thewire:error");
+		return $return;
 	}
-
-	return "success";
+	$return['success'] = true;
+	return $return;
 	} 
 				
-expose_function('wire.post',
-				"rest_wire_post",
+expose_function('wire.save_post',
+				"rest_wire_save_post",
 				array('username' => array ('type' => 'string'),
 						'text' => array ('type' => 'string'),
 						'access' => array ('type' => 'string', 'required' => false),
 					),
 				"Post a wire post",
-				'GET',
+				'POST',
 				true,
 				false);
 				
@@ -53,7 +55,7 @@ expose_function('wire.post',
  *
  * @return bool
  */
-function rest_wire_read($username) {
+function rest_wire_get_post($username, $limit = 10, $offset = 0) {
 	$user = get_user_by_username($username);
 	if (!$user) {
 		throw new InvalidParameterException('registration:usernamenotvalid');
@@ -63,19 +65,23 @@ function rest_wire_read($username) {
 		'types' => 'object',
 		'subtypes' => 'thewire',
 		'owner_guid' => $user->guid,
-		'limit' => 1,
+		'limit' => $limit,
+		'offset' => $offset,
 	);
 	$latest_wire = elgg_get_entities($params);
 
-	$wire['guid'] = $latest_wire[0]->guid;
-	$wire['time_created'] = $latest_wire[0]->time_created;
-	$wire['description'] = $latest_wire[0]->description;
+	foreach($latest_wire as $single ) {
+		$wire[$single->guid]['time_created'] = $single->time_created;
+		$wire[$single->guid]['description'] = $single->description;
+	}
 	return $wire;
 	} 
 				
-expose_function('wire.read',
-				"rest_wire_read",
+expose_function('wire.get_posts',
+				"rest_wire_get_post",
 				array('username' => array ('type' => 'string'),
+						'limit' => array ('type' => 'int', 'required' => false),
+						'offset' => array ('type' => 'int', 'required' => false),
 					),
 				"Read lates wire post",
 				'GET',
@@ -91,7 +97,7 @@ expose_function('wire.read',
  *
  * @return bool
  */
-function rest_wire_friend($username, $password, $limit = 10, $offset = 0) {
+function rest_wire_get_friends_posts($username, $limit = 10, $offset = 0) {
 	$user = get_user_by_username($username);
 	if (!$user) {
 		throw new InvalidParameterException('registration:usernamenotvalid');
@@ -99,15 +105,19 @@ function rest_wire_friend($username, $password, $limit = 10, $offset = 0) {
 
 	$posts = get_user_friends_objects($user->guid, 'thewire', $limit, $offset);
 
-	foreach($posts as $single ) {
-		$wire[$single->guid]['time_created'] = $single->time_created;
-		$wire[$single->guid]['description'] = $single->description;
+	if($posts) {
+		foreach($posts as $single ) {
+			$wire[$single->guid]['time_created'] = $single->time_created;
+			$wire[$single->guid]['description'] = $single->description;
+		}
+	} else {
+		$wire['error']['message'] = elgg_echo('thewire:noposts');
 	}
 	return $wire;
-	} 
+} 
 				
-expose_function('wire.friend',
-				"rest_wire_friend",
+expose_function('wire.get_friends_posts',
+				"rest_wire_get_friends_posts",
 				array('username' => array ('type' => 'string'),
 						'limit' => array ('type' => 'int', 'required' => false),
 						'offset' => array ('type' => 'int', 'required' => false),
@@ -132,7 +142,7 @@ function rest_wire_delete($username, $wireid) {
 	}
 	
 	$thewire = get_entity($wireid);
-
+	$return['success'] = false;
 	if ($thewire->getSubtype() == "thewire" && $thewire->canEdit($user->guid)) {
 		$children = elgg_get_entities_from_relationship(array(
 			'relationship' => 'parent',
@@ -146,17 +156,19 @@ function rest_wire_delete($username, $wireid) {
 		}
 		$rowsaffected = $thewire->delete();
 		if ($rowsaffected > 0) {
-			return elgg_echo("thewire:deleted");
+			$return['success'] = true;
+			$return['message'] = elgg_echo("thewire:deleted");
 		} else {
-			return elgg_echo("thewire:notdeleted");
+			$return['message'] = elgg_echo("thewire:notdeleted");
 		}
 	}
 	else {
-		return elgg_echo("thewire:notdeleted");
+		$return['message'] = elgg_echo("thewire:notdeleted");
 	}
+	return $return;
 } 
 				
-expose_function('wire.delete',
+expose_function('wire.delete_posts',
 				"rest_wire_delete",
 				array('username' => array ('type' => 'string'),
 						'wireid' => array ('type' => 'int'),
