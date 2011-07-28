@@ -37,7 +37,7 @@ class ElggWebServicesWireTest extends ElggCoreUnitTest {
 	 * Called before each test method.
 	 */
 	public function setUp() {
-		$this->client = new ElggApiClient(elgg_get_site_url(), '2dcbe06b8318d8b3ea72523f7135ae6edfcc75c1');
+		$this->client = new ElggApiClient(elgg_get_site_url(), '7c20dbca959d1a8f22c1f30bf6a1f0e189bc34af');
 		$result = $this->client->obtainAuthToken($this->user->username, 'pass123');
 		if (!$result) {
 		   echo "Error in getting auth token!\n";

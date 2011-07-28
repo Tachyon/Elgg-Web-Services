@@ -10,24 +10,25 @@ class ElggWebServicesUserTest extends ElggCoreUnitTest {
 	public function __construct() {
 		$this->ia = elgg_set_ignore_access(TRUE);
 		parent::__construct();
-		$this->user = new ElggUserTest();
+		$this->user = new ElggUser();
 		$this->user->username = 'test_username_' . rand(); 
 		$this->user->email = 'test@test.org';
 		$this->user->name = 'I am a Test User';
 		$this->user->access_id = ACCESS_PUBLIC;
 		$this->user->salt = generate_random_cleartext_password(); 
 		$this->user->password = generate_user_password($this->user, "pass123");
+		$this->user->container_guid = 0;
+		$this->user->owner_guid = 0;
 		$this->user->save();
-		$this->user->makeAdmin();
 		// all __construct() code should come after here
-		$this->user2 = new ElggUserTest();
+		$this->user2 = new ElggUser();
 	}
 
 	/**
 	 * Called before each test method.
 	 */
 	public function setUp() {
-		$this->client = new ElggApiClient(elgg_get_site_url(), '2dcbe06b8318d8b3ea72523f7135ae6edfcc75c1');
+		$this->client = new ElggApiClient(elgg_get_site_url(), '7c20dbca959d1a8f22c1f30bf6a1f0e189bc34af');
 		$result = $this->client->obtainAuthToken($this->user->username, 'pass123');
 		if (!$result) {
 		   echo "Error in getting auth token!\n";
@@ -146,15 +147,18 @@ class ElggWebServicesUserTest extends ElggCoreUnitTest {
 						'offset' => 0,
 					);				
 		$results = $this->client->get('user.friend.get_friends', $params);
-		$this->assertTrue($results->success);
-		$this->assertEqual($results->friends[0]->username, $this->user2->username);
-		
+		$this->assertNull($results->error->message);
+		foreach($results as $guid => $friend) {
+			$this->assertEqual($results->$guid->username, $this->user2->username);
+		}
+		var_dump($results);
 		$params = array('username' => $this->user2->username,
 						'limit' => 1,
 						'offset' => 0,
 					);				
 		$results = $this->client->get('user.friend.get_friends', $params);
-		$this->assertFalse($results->success);
+		$this->assertEqual($results->error->message, elgg_echo('friends:none'));
+		var_dump($results);
 	}
 	
 	public function testGetFriendsOf() {
@@ -163,14 +167,16 @@ class ElggWebServicesUserTest extends ElggCoreUnitTest {
 						'offset' => 0,
 					);				
 		$results = $this->client->get('user.friend.get_friends_of', $params);
-		$this->assertFalse($results->success);
+		$this->assertEqual($results->error->message, elgg_echo('friends:none'));
 		$params = array('username' => $this->user2->username,
 						'limit' => 1,
 						'offset' => 0,
 					);				
 		$results = $this->client->get('user.friend.get_friends_of', $params);
-		$this->assertTrue($results->success);
-		$this->assertEqual($results->friends[0]->username, $this->user->username);
+		$this->assertNull($results->error->message);
+		foreach($results as $guid => $friend) {
+			$this->assertEqual($results->$guid->username, $this->user->username);
+		}
 	}
 	
 	public function testFriendRemove() {

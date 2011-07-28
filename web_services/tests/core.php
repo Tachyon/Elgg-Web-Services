@@ -37,13 +37,18 @@ class ElggWebServicesCoreTest extends ElggCoreUnitTest {
 		// all __destruct() code should go above here
 		parent::__destruct();
 	}
+	
+	public function testSiteTest() {
+		$results = $this->client->get('site.test');
+		$this->assertEqual($results->success, true);
+		$this->assertEqual($results->message, "Hello");
+	}
 
 	public function testSiteGetinfo() {
 		$results = $this->client->get('site.getinfo');
-		$site = elgg_get_site_entity();
+		$site = elgg_get_config('site');
 		$this->assertEqual($results->url, elgg_get_site_url());
 		$this->assertEqual($results->sitename, $site->name);
 		$this->assertEqual($results->language, elgg_get_config('language'));
 	}
-
 }
