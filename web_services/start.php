@@ -45,9 +45,13 @@ function web_services_test($hook, $type, $value, $params) {
 	//}
 
 	// right now just register user web services
-	$value[] = elgg_get_plugins_path() . 'web_services/tests/core.php';
+	//$value = array();
 	$value[] = elgg_get_plugins_path() . 'web_services/tests/user.php';
-
+	$value[] = elgg_get_plugins_path() . 'web_services/tests/blog.php';
+	$value[] = elgg_get_plugins_path() . 'web_services/tests/group.php';
+	$value[] = elgg_get_plugins_path() . 'web_services/tests/wire.php';
+	$value[] = elgg_get_plugins_path() . 'web_services/tests/file.php';
+	$value[] = elgg_get_plugins_path() . 'web_services/tests/core.php';
 	return $value;
 }
 
