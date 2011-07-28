@@ -13,7 +13,8 @@
  * @return string $response Hello
  */
 function rest_site_test() {
-	$response = "Hello";
+	$response['success'] = true;
+	$response['message'] = "Hello";
 	return $response;
 } 
 
