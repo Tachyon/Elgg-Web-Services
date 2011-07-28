@@ -93,13 +93,13 @@ expose_function('likes.delete',
  *
  * @return bool
  */
-function likes_count($entity_guid) {
+function likes_count_number_of_likes($entity_guid) {
 	$entity = get_entity($entity_guid);
 	return likes_count($entity);
 } 
 				
 expose_function('likes.count',
-				"likes_count",
+				"likes_count_number_of_likes",
 				array('entity_guid' => array ('type' => 'int'),
 					),
 				"Count number of likes",
