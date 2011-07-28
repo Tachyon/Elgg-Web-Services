@@ -151,14 +151,12 @@ class ElggWebServicesUserTest extends ElggCoreUnitTest {
 		foreach($results as $guid => $friend) {
 			$this->assertEqual($results->$guid->username, $this->user2->username);
 		}
-		var_dump($results);
 		$params = array('username' => $this->user2->username,
 						'limit' => 1,
 						'offset' => 0,
 					);				
 		$results = $this->client->get('user.friend.get_friends', $params);
 		$this->assertEqual($results->error->message, elgg_echo('friends:none'));
-		var_dump($results);
 	}
 	
 	public function testGetFriendsOf() {
