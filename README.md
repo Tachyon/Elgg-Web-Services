@@ -221,14 +221,11 @@ List of Web Services
 	```
 	
 	```
-	object(stdClass)[3]
-  public 'success' => boolean true
-  public 'friends' => 
-    array
-      0 => 
-        object(stdClass)[4]
-          public 'username' => string 'tachyon' (length=7)
-          public 'name' => string 'Saket Saurabh' (length=13)
+	object(stdClass)[334]
+	  public '3393' => 
+		object(stdClass)[300]
+		  public 'username' => string 'Tachyon' (length=19)
+		  public 'name' => string 'Saket Saurabh' (length=16)
 	```
 	
  * user.friend.get_friends_of       Obtains the people who have made a given user a friend
@@ -243,8 +240,11 @@ List of Web Services
 	```
 
 	```
-	object(stdClass)[3]
-		public 'Admin' => string 'Administrator' (length=13)
+	object(stdClass)[334]
+	  public '3393' => 
+		object(stdClass)[300]
+		  public 'username' => string 'admin' (length=19)
+		  public 'name' => string 'Administrator' (length=16)
 	```
 	
 ### Blog
@@ -294,7 +294,7 @@ List of Web Services
 	$params = array('guid' => 53,
 					'username' => 'admin'
 					);
-	$info = $this->client->get('blog.delete_post', $params);
+	$info = $this->client->post('blog.delete_post', $params);
 	var_dump($info);
 	```
 	
@@ -364,7 +364,7 @@ List of Web Services
 	$params = array('username' => 'tachyon',
 					'groupid' => 72,
 					);
-	$info = $this->client->get('group.join', $params);
+	$info = $this->client->post('group.join', $params);
 	var_dump($info);
 	```
 	
@@ -380,7 +380,7 @@ List of Web Services
 	$params = array('username' => 'tachyon',
 					'groupid' => 72,
 					);
-	$info = $this->client->get('group.leave', $params);
+	$info = $this->client->post('group.leave', $params);
 	var_dump($info);
 	```
 	
@@ -398,7 +398,7 @@ List of Web Services
 						'title' => 'testing post',
 						'desc' => 'hello i am testing web services',
 					);
-	$info = $this->client->get('group.forum.save_post', $params);
+	$info = $this->client->post('group.forum.save_post', $params);
 	var_dump($info);
 	```
 	
@@ -414,7 +414,7 @@ List of Web Services
 	$params = array('username' => 'admin',
 					'topicid' => 84,
 					);
-	$info = $this->client->get('group.forum.delete_post', $params);
+	$info = $this->client->post('group.forum.delete_post', $params);
 	var_dump($info);
 	```
 	
@@ -449,7 +449,7 @@ List of Web Services
 		  public 'last_action' => string '1310321462' (length=10)
 	```
 	
- * group.forum.get_replies     Get replies on a post
+ * group.forum.get_reply     Get replies on a post
  
 	```
 	$params = array('postid' => 56,
@@ -476,14 +476,14 @@ List of Web Services
 		  public 'value_type' => string 'text' (length=4)
 	```
 	
- * group.forum.save_replies    Post a reply
+ * group.forum.save_reply    Post a reply
   
 	```
 	$params = array('username' => 'admin',
 						'postid' => 56,
 						'text' => 'My reply',
 					);
-	$info = $this->client->post('group.forum.save_replies', $params);
+	$info = $this->client->post('group.forum.save_reply', $params);
 	var_dump($info);
 	```
 	
@@ -527,7 +527,7 @@ List of Web Services
 		public 'message' => string 'succesfully saved' (length=17)
 	```
 	
- * wire.get_post         Read latest wire post of user
+ * wire.get_posts         Read latest wire post of user
  
 	```
 	$params = array('username' => 'admin',
@@ -568,7 +568,7 @@ List of Web Services
 	$params = array('username' => 'admin',
 					'wireid' => 64,
 					);
-	$info = $this->client->get('wire.delete_posts', $params);
+	$info = $this->client->post('wire.delete_posts', $params);
 	var_dump($info);
 	```
 	
