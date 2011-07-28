@@ -12,7 +12,7 @@
  *
  * @return string $profile_labels Array of profile labels
  */
-function rest_user_get_profile_fields() {	
+function user_get_profile_fields() {	
 	$user_fields = elgg_get_config('profile_fields');
 	foreach ($user_fields as $key => $type) {
 		$profile_labels[$key]['label'] = elgg_echo('profile:'.$key);
@@ -22,7 +22,7 @@ function rest_user_get_profile_fields() {
 }
 	
 expose_function('user.get_profile_fields',
-				"rest_user_get_profile_fields",
+				"user_get_profile_fields",
 				array(),
 				"Get user profile labels",
 				'GET',
@@ -36,7 +36,7 @@ expose_function('user.get_profile_fields',
  *
  * @return string $user_fields Array of profile information with labels as the keys
  */
-function rest_user_get_profile($username) {
+function user_get_profile($username) {
 	$user = get_user_by_username($username);
 	if (!$user) {
 		throw new InvalidParameterException('registration:usernamenotvalid');
@@ -50,7 +50,7 @@ function rest_user_get_profile($username) {
 }
 
 expose_function('user.get_profile',
-				"rest_user_get_profile",
+				"user_get_profile",
 				array('username' => array ('type' => 'string')
 					),
 				"Get user profile labels",
@@ -64,7 +64,7 @@ expose_function('user.get_profile',
  *
  * @return bool 
  */
-function rest_user_save_profile($username, $profile) {
+function user_save_profile($username, $profile) {
 	$user = get_user_by_username($username);
 	if (!$user) {
 		throw new InvalidParameterException('registration:usernamenotvalid');
@@ -128,7 +128,7 @@ function rest_user_save_profile($username, $profile) {
 }
 	
 expose_function('user.save_profile',
-				"rest_user_save_profile",
+				"user_save_profile",
 				array('username' => array ('type' => 'string'),
 					 'profile' => array ('type' => 'array'),
 					),
@@ -144,7 +144,7 @@ expose_function('user.save_profile',
  *
  * @return string $foundusers Array of usernames registered with this email ID
  */
-function rest_user_get_user_by_email($email) {
+function user_get_user_by_email($email) {
 	if (!validate_email_address($email)) {
 		throw new RegistrationException(elgg_echo('registration:notemail'));
 	}
@@ -160,7 +160,7 @@ function rest_user_get_user_by_email($email) {
 }
 
 expose_function('user.get_user_by_email',
-				"rest_user_get_user_by_email",
+				"user_get_user_by_email",
 				array('email' => array ('type' => 'string'),
 					),
 				"Get Username by email",
@@ -175,7 +175,7 @@ expose_function('user.get_user_by_email',
  *
  * @return bool
  */           
-function rest_user_check_username_availability($username) {
+function user_check_username_availability($username) {
 	$user = get_user_by_username($username);
 	if (!$user) {
 		return true;
@@ -185,7 +185,7 @@ function rest_user_check_username_availability($username) {
 }
 
 expose_function('user.check_username_availability',
-				"rest_user_check_username_availability",
+				"user_check_username_availability",
 				array('username' => array ('type' => 'string'),
 					),
 				"Get Username by email",
@@ -203,7 +203,7 @@ expose_function('user.check_username_availability',
  *
  * @return bool
  */           
-function rest_user_register($name, $email, $username, $password) {
+function user_register($name, $email, $username, $password) {
 	$user = get_user_by_username($username);
 	if (!$user) {
 		$return['success'] = true;
@@ -216,7 +216,7 @@ function rest_user_register($name, $email, $username, $password) {
 }
 
 expose_function('user.register',
-				"rest_user_register",
+				"user_register",
 				array('name' => array ('type' => 'string'),
 						'email' => array ('type' => 'string'),
 						'username' => array ('type' => 'string'),
@@ -235,7 +235,7 @@ expose_function('user.register',
  *
  * @return bool
  */           
-function rest_user_friend_add($username, $friend) {
+function user_friend_add($username, $friend) {
 	$user = get_user_by_username($username);
 	$return['success'] = false;
 	if (!$user) {
@@ -271,7 +271,7 @@ function rest_user_friend_add($username, $friend) {
 }
 
 expose_function('user.friend.add',
-				"rest_user_friend_add",
+				"user_friend_add",
 				array('username' => array ('type' => 'string'),
 						'friend' => array ('type' => 'string'),
 					),
@@ -289,7 +289,7 @@ expose_function('user.friend.add',
  *
  * @return bool
  */           
-function rest_user_friend_remove($username, $friend) {
+function user_friend_remove($username, $friend) {
 	$user = get_user_by_username($username);
 	$return['success'] = false;
 	if (!$user) {
@@ -322,7 +322,7 @@ function rest_user_friend_remove($username, $friend) {
 }
 
 expose_function('user.friend.remove',
-				"rest_user_friend_remove",
+				"user_friend_remove",
 				array('username' => array ('type' => 'string'),
 						'friend' => array ('type' => 'string'),
 					),
@@ -340,7 +340,7 @@ expose_function('user.friend.remove',
  *
  * @return array
  */           
-function rest_user_get_friends($username, $limit = 10, $offset = 0) {
+function user_get_friends($username, $limit = 10, $offset = 0) {
 	$user = get_user_by_username($username);
 	if (!$user) {
 		throw new InvalidParameterException(elgg_echo('registration:usernamenotvalid'));
@@ -361,7 +361,7 @@ function rest_user_get_friends($username, $limit = 10, $offset = 0) {
 }
 
 expose_function('user.friend.get_friends',
-				"rest_user_get_friends",
+				"user_get_friends",
 				array('username' => array ('type' => 'string', 'required' => true),
 						'limit' => array ('type' => 'int', 'required' => false),
 						'offset' => array ('type' => 'int', 'required' => false),
@@ -380,7 +380,7 @@ expose_function('user.friend.get_friends',
  *
  * @return array
  */           
-function rest_user_get_friends_of($username, $limit = 10, $offset = 0) {
+function user_get_friends_of($username, $limit = 10, $offset = 0) {
 	$user = get_user_by_username($username);
 	if (!$user) {
 		throw new InvalidParameterException(elgg_echo('registration:usernamenotvalid'));
@@ -401,7 +401,7 @@ function rest_user_get_friends_of($username, $limit = 10, $offset = 0) {
 }
 
 expose_function('user.friend.get_friends_of',
-				"rest_user_get_friends_of",
+				"user_get_friends_of",
 				array('username' => array ('type' => 'string', 'required' => true),
 						'limit' => array ('type' => 'int', 'required' => false),
 						'offset' => array ('type' => 'int', 'required' => false),

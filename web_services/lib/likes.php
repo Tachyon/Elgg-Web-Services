@@ -14,7 +14,7 @@
  *
  * @return bool
  */
-function rest_likes_add($entity_guid) {
+function likes_add($entity_guid) {
 	if (elgg_annotation_exists($entity_guid, 'likes')) {
 		return elgg_echo("likes:alreadyliked");
 	}
@@ -46,7 +46,7 @@ function rest_likes_add($entity_guid) {
 } 
 				
 expose_function('likes.add',
-				"rest_likes_add",
+				"likes_add",
 				array('entity_guid' => array ('type' => 'int'),
 					),
 				"Add a like",
@@ -61,7 +61,7 @@ expose_function('likes.add',
  *
  * @return bool
  */
-function rest_likes_delete($entity_guid) {
+function likes_delete($entity_guid) {
 	$likes = elgg_get_annotations(array(
 		'guid' => $entity_guid,
 		'annotation_owner_guid' => elgg_get_logged_in_user_guid(),
@@ -78,7 +78,7 @@ function rest_likes_delete($entity_guid) {
 } 
 				
 expose_function('likes.delete',
-				"rest_likes_delete",
+				"likes_delete",
 				array('entity_guid' => array ('type' => 'int'),
 					),
 				"Delete a like",
@@ -93,13 +93,13 @@ expose_function('likes.delete',
  *
  * @return bool
  */
-function rest_likes_count($entity_guid) {
+function likes_count($entity_guid) {
 	$entity = get_entity($entity_guid);
 	return likes_count($entity);
 } 
 				
 expose_function('likes.count',
-				"rest_likes_count",
+				"likes_count",
 				array('entity_guid' => array ('type' => 'int'),
 					),
 				"Count number of likes",
@@ -114,7 +114,7 @@ expose_function('likes.count',
  *
  * @return bool
  */
-function rest_likes_getusers($entity_guid) {
+function likes_getusers($entity_guid) {
 	$entity = get_entity($entity_guid);
 	if( likes_count($entity) > 0 ) {
 		$list = elgg_get_annotations(array('guid' => $entity_guid, 'annotation_name' => 'likes', 'limit' => 99));
@@ -132,7 +132,7 @@ function rest_likes_getusers($entity_guid) {
 
 				
 expose_function('likes.getusers',
-				"rest_likes_getusers",
+				"likes_getusers",
 				array('entity_guid' => array ('type' => 'int'),
 					),
 				"Get users who liked an entity",

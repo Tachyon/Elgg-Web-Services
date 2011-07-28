@@ -17,7 +17,7 @@
  *
  * @return bool
  */
-function rest_wire_save_post($username, $text, $access = ACCESS_PUBLIC) {
+function wire_save_post($username, $text, $access = ACCESS_PUBLIC) {
 	$user = get_user_by_username($username);
 	if (!$user) {
 		throw new InvalidParameterException('registration:usernamenotvalid');
@@ -38,7 +38,7 @@ function rest_wire_save_post($username, $text, $access = ACCESS_PUBLIC) {
 	} 
 				
 expose_function('wire.save_post',
-				"rest_wire_save_post",
+				"wire_save_post",
 				array('username' => array ('type' => 'string'),
 						'text' => array ('type' => 'string'),
 						'access' => array ('type' => 'string', 'required' => false),
@@ -55,7 +55,7 @@ expose_function('wire.save_post',
  *
  * @return bool
  */
-function rest_wire_get_post($username, $limit = 10, $offset = 0) {
+function wire_get_post($username, $limit = 10, $offset = 0) {
 	$user = get_user_by_username($username);
 	if (!$user) {
 		throw new InvalidParameterException('registration:usernamenotvalid');
@@ -78,7 +78,7 @@ function rest_wire_get_post($username, $limit = 10, $offset = 0) {
 	} 
 				
 expose_function('wire.get_posts',
-				"rest_wire_get_post",
+				"wire_get_post",
 				array('username' => array ('type' => 'string'),
 						'limit' => array ('type' => 'int', 'required' => false),
 						'offset' => array ('type' => 'int', 'required' => false),
@@ -97,7 +97,7 @@ expose_function('wire.get_posts',
  *
  * @return bool
  */
-function rest_wire_get_friends_posts($username, $limit = 10, $offset = 0) {
+function wire_get_friends_posts($username, $limit = 10, $offset = 0) {
 	$user = get_user_by_username($username);
 	if (!$user) {
 		throw new InvalidParameterException('registration:usernamenotvalid');
@@ -117,7 +117,7 @@ function rest_wire_get_friends_posts($username, $limit = 10, $offset = 0) {
 } 
 				
 expose_function('wire.get_friends_posts',
-				"rest_wire_get_friends_posts",
+				"wire_get_friends_posts",
 				array('username' => array ('type' => 'string'),
 						'limit' => array ('type' => 'int', 'required' => false),
 						'offset' => array ('type' => 'int', 'required' => false),
@@ -135,7 +135,7 @@ expose_function('wire.get_friends_posts',
  *
  * @return bool
  */
-function rest_wire_delete($username, $wireid) {
+function wire_delete($username, $wireid) {
 	$user = get_user_by_username($username);
 	if (!$user) {
 		throw new InvalidParameterException('registration:usernamenotvalid');
@@ -169,7 +169,7 @@ function rest_wire_delete($username, $wireid) {
 } 
 				
 expose_function('wire.delete_posts',
-				"rest_wire_delete",
+				"wire_delete",
 				array('username' => array ('type' => 'string'),
 						'wireid' => array ('type' => 'int'),
 					),

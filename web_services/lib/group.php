@@ -15,7 +15,7 @@
  *
  * @return bool
  */
-function rest_group_join($username, $groupid) {
+function group_join($username, $groupid) {
 	$user = get_user_by_username($username);
 	if (!$user) {
 		throw new InvalidParameterException('registration:usernamenotvalid');
@@ -73,7 +73,7 @@ function rest_group_join($username, $groupid) {
 } 
 				
 expose_function('group.join',
-				"rest_group_join",
+				"group_join",
 				array('username' => array ('type' => 'string'),
 						'groupid' => array ('type' => 'string'),
 					),
@@ -90,7 +90,7 @@ expose_function('group.join',
  *
  * @return bool
  */
-function rest_group_leave($username, $groupid) {
+function group_leave($username, $groupid) {
 	$user = get_user_by_username($username);
 	if (!$user) {
 		throw new InvalidParameterException('registration:usernamenotvalid');
@@ -117,7 +117,7 @@ function rest_group_leave($username, $groupid) {
 } 
 				
 expose_function('group.leave',
-				"rest_group_leave",
+				"group_leave",
 				array('username' => array ('type' => 'string'),
 						'groupid' => array ('type' => 'string'),
 					),
@@ -138,7 +138,7 @@ expose_function('group.leave',
  *
  * @return bool
  */
-function rest_group_forum_save_post($username, $groupid, $title, $desc, $tags = "", $status = "published", $access_id = ACCESS_DEFAULT) {
+function group_forum_save_post($username, $groupid, $title, $desc, $tags = "", $status = "published", $access_id = ACCESS_DEFAULT) {
 	$user = get_user_by_username($username);
 	if (!$user) {
 		throw new InvalidParameterException('registration:usernamenotvalid');
@@ -177,7 +177,7 @@ function rest_group_forum_save_post($username, $groupid, $title, $desc, $tags = 
 } 
 				
 expose_function('group.forum.save_post',
-				"rest_group_forum_save_post",
+				"group_forum_save_post",
 				array('username' => array ('type' => 'string'),
 						'groupid' => array ('type' => 'int'),
 						'title' => array ('type' => 'string'),
@@ -199,7 +199,7 @@ expose_function('group.forum.save_post',
  *
  * @return bool
  */
-function rest_group_forum_delete_post($username, $topicid) {
+function group_forum_delete_post($username, $topicid) {
 	$topic = get_entity($topicid);
 	
 	$return['success'] = false;
@@ -231,7 +231,7 @@ function rest_group_forum_delete_post($username, $topicid) {
 } 
 				
 expose_function('group.forum.delete_post',
-				"rest_group_forum_delete_post",
+				"group_forum_delete_post",
 				array('username' => array ('type' => 'string'),
 						'topicid' => array ('type' => 'int'),
 					),
@@ -249,7 +249,7 @@ expose_function('group.forum.delete_post',
  *
  * @return bool
  */
-function rest_group_forum_latest_post($groupid, $limit = 10, $offset = 0) {
+function group_forum_latest_post($groupid, $limit = 10, $offset = 0) {
 	$group = get_entity($groupid);
 	if (!$group) {
 		return elgg_echo('group:notfound');
@@ -284,7 +284,7 @@ function rest_group_forum_latest_post($groupid, $limit = 10, $offset = 0) {
 } 
 				
 expose_function('group.forum.get_latest_post',
-				"rest_group_forum_latest_post",
+				"group_forum_latest_post",
 				array('groupid' => array ('type' => 'string'),
 					  'limit' => array ('type' => 'int', 'required' => false),
 					  'offset' => array ('type' => 'int', 'required' => false),
@@ -303,7 +303,7 @@ expose_function('group.forum.get_latest_post',
  *
  * @return bool
  */
-function rest_group_forum_get_reply($postid, $limit = 10, $offset = 0) {
+function group_forum_get_reply($postid, $limit = 10, $offset = 0) {
 	$group = get_entity($postid);
 	$options = array(
 		'guid' => $postid,
@@ -333,7 +333,7 @@ function rest_group_forum_get_reply($postid, $limit = 10, $offset = 0) {
 } 
 				
 expose_function('group.forum.get_reply',
-				"rest_group_forum_get_reply",
+				"group_forum_get_reply",
 				array('postid' => array ('type' => 'string'),
 					  'limit' => array ('type' => 'int', 'required' => false),
 					  'offset' => array ('type' => 'int', 'required' => false),
@@ -352,7 +352,7 @@ expose_function('group.forum.get_reply',
  *
  * @return bool
  */
-function rest_group_forum_save_reply($username, $postid, $text) {
+function group_forum_save_reply($username, $postid, $text) {
 	$entity_guid = (int) get_input('entity_guid');
 	$return['success'] = false;
 	if (empty($text)) {
@@ -390,7 +390,7 @@ function rest_group_forum_save_reply($username, $postid, $text) {
 } 
 				
 expose_function('group.forum.save_reply',
-				"rest_group_forum_save_reply",
+				"group_forum_save_reply",
 				array('username' => array ('type' => 'string'),
 						'postid' => array ('type' => 'string'),
 						'text' => array ('type' => 'string'),
@@ -408,7 +408,7 @@ expose_function('group.forum.save_reply',
  *
  * @return bool
  */
-function rest_group_forum_delete_reply($username, $id) {
+function group_forum_delete_reply($username, $id) {
 	$reply = elgg_get_annotation_from_id($id);
 	$return['success'] = false;
 	if (!$reply || $reply->name != 'group_topic_post') {
@@ -439,7 +439,7 @@ function rest_group_forum_delete_reply($username, $id) {
 } 
 				
 expose_function('group.forum.delete_reply',
-				"rest_group_forum_delete_reply",
+				"group_forum_delete_reply",
 				array('username' => array ('type' => 'string'),
 						'id' => array ('type' => 'string'),
 					),

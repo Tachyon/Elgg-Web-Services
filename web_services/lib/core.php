@@ -12,14 +12,14 @@
  *
  * @return string $response Hello
  */
-function rest_site_test() {
+function site_test() {
 	$response['success'] = true;
 	$response['message'] = "Hello";
 	return $response;
 } 
 
 expose_function('site.test',
-				"rest_site_test",
+				"site_test",
 				array(),
 				"Get site information",
 				'GET',
@@ -33,7 +33,7 @@ expose_function('site.test',
  * @return string $sitename Name of Elgg website
  * @return string $language Language of Elgg website
  */
-function rest_site_getinfo() {
+function site_getinfo() {
 	$site = elgg_get_config('site');
 
 	$siteinfo['url'] = elgg_get_site_url();
@@ -44,7 +44,7 @@ function rest_site_getinfo() {
 } 
 
 expose_function('site.getinfo',
-				"rest_site_getinfo",
+				"site_getinfo",
 				array(),
 				"Get site information",
 				'GET',

@@ -19,7 +19,7 @@
  *
  * @return bool
  */
-function rest_blog_save($username, $title, $text, $excerpt = "", $tags = "blog" , $access = ACCESS_PUBLIC) {
+function blog_save($username, $title, $text, $excerpt = "", $tags = "blog" , $access = ACCESS_PUBLIC) {
 	$user = get_user_by_username($username);
 	if (!$user) {
 		throw new InvalidParameterException('registration:usernamenotvalid');
@@ -48,7 +48,7 @@ function rest_blog_save($username, $title, $text, $excerpt = "", $tags = "blog" 
 	} 
 	
 expose_function('blog.save_post',
-				"rest_blog_save",
+				"blog_save",
 				array('username' => array ('type' => 'string', 'required' => true),
 						'title' => array ('type' => 'string', 'required' => true),
 						'text' => array ('type' => 'string', 'required' => true),
@@ -77,7 +77,7 @@ expose_function('blog.save_post',
  * @return string $status      (Published/Draft)
  * @return string $comments_on On/Off
  */
-function rest_blog_get_post($guid, $username) {
+function blog_get_post($guid, $username) {
 	$return = array();
 	$blog = get_entity($guid);
 
@@ -116,7 +116,7 @@ function rest_blog_get_post($guid, $username) {
 }
 	
 expose_function('blog.get_post',
-				"rest_blog_get_post",
+				"blog_get_post",
 				array('guid' => array ('type' => 'string'),
 						'username' => array ('type' => 'string'),
 					),
@@ -134,7 +134,7 @@ expose_function('blog.get_post',
  *
  * @return bool
  */
-function rest_blog_delete_post($guid, $username) {
+function blog_delete_post($guid, $username) {
 	$return = array();
 	$blog = get_entity($guid);
 	$return['success'] = false;
@@ -167,7 +167,7 @@ function rest_blog_delete_post($guid, $username) {
 }
 	
 expose_function('blog.delete_post',
-				"rest_blog_delete_post",
+				"blog_delete_post",
 				array('guid' => array ('type' => 'string'),
 						'username' => array ('type' => 'string'),
 					),
@@ -194,7 +194,7 @@ expose_function('blog.delete_post',
  * @return string $status       (Published/Draft)
  * @return string $comments_on  On/Off
  */
-function rest_blog_get_friends_posts($username, $limit = 10, $offset = 0) {
+function blog_get_friends_posts($username, $limit = 10, $offset = 0) {
 	$user = get_user_by_username($username);
 	if (!$user) {
 		throw new InvalidParameterException('registration:usernamenotvalid');
@@ -220,7 +220,7 @@ function rest_blog_get_friends_posts($username, $limit = 10, $offset = 0) {
 	} 
 				
 expose_function('blog.get_friends_posts',
-				"rest_blog_get_friends_posts",
+				"blog_get_friends_posts",
 				array('username' => array ('type' => 'string'),
 						'limit' => array ('type' => 'int', 'required' => false),
 						'offset' => array ('type' => 'int', 'required' => false),
@@ -247,7 +247,7 @@ expose_function('blog.get_friends_posts',
  * @return string $status       (Published/Draft)
  * @return string $comments_on  On/Off
  */
-function rest_blog_get_latest_posts($username = NULL, $limit = 10, $offset = 0) {
+function blog_get_latest_posts($username = NULL, $limit = 10, $offset = 0) {
 	if($username) {
 		$user = get_user_by_username($username);
 		if (!$user) {
@@ -294,7 +294,7 @@ function rest_blog_get_latest_posts($username = NULL, $limit = 10, $offset = 0) 
 	} 
 				
 expose_function('blog.get_latest_posts',
-				"rest_blog_get_latest_posts",
+				"blog_get_latest_posts",
 				array('username' => array ('type' => 'string', 'required' => false),
 						'limit' => array ('type' => 'int', 'required' => false),
 						'offset' => array ('type' => 'int', 'required' => false),

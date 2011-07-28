@@ -15,7 +15,7 @@
  *
  * @return array $file Array of files uploaded
  */
-function rest_file_get_files($username, $limit = 10, $offset = 0) {	
+function file_get_files($username, $limit = 10, $offset = 0) {	
 	if($username) {
 		$user = get_user_by_username($username);
 		if (!$user) {
@@ -55,7 +55,7 @@ function rest_file_get_files($username, $limit = 10, $offset = 0) {
 }
 	
 expose_function('file.get_files',
-				"rest_file_get_files",
+				"file_get_files",
 				array('username' => array ('type' => 'string'),
 					  'limit' => array ('type' => 'int', 'required' => false),
 					  'offset' => array ('type' => 'int', 'required' => false),
@@ -74,7 +74,7 @@ expose_function('file.get_files',
  *
  * @return array $file Array of files uploaded
  */
-function rest_file_get_files_by_friend($username, $limit = 10, $offset = 0) {	
+function file_get_files_by_friend($username, $limit = 10, $offset = 0) {	
 	$user = get_user_by_username($username);
 	if (!$user) {
 		throw new InvalidParameterException('registration:usernamenotvalid');
@@ -98,7 +98,7 @@ function rest_file_get_files_by_friend($username, $limit = 10, $offset = 0) {
 }
 	
 expose_function('file.get_files_by_friend',
-				"rest_file_get_files_by_friend",
+				"file_get_files_by_friend",
 				array('username' => array ('type' => 'string'),
 					  'limit' => array ('type' => 'int', 'required' => false),
 					  'offset' => array ('type' => 'int', 'required' => false),
