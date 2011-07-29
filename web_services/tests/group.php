@@ -30,13 +30,25 @@ class ElggWebServicesGroupTest extends ElggCoreUnitTest {
 		$this->forum['title'] = "Test title post";
 		$this->forum['desc'] = "Content of test post";
 		$this->forum['guid'] = "";
+		
+		// generating API key
+		$keypair = create_api_user($CONFIG->site_id);
+		if ($keypair)
+		{
+			$this->apikey = new ElggObject();
+			$this->apikey->subtype = 'api_key';
+			$this->apikey->access_id = ACCESS_PUBLIC;
+			$this->apikey->title = "File web services";
+			$this->apikey->public = $keypair->api_key;
+			$this->apikey->save();
+		}
 	}
 
 	/**
 	 * Called before each test method.
 	 */
 	public function setUp() {
-		$this->client = new ElggApiClient(elgg_get_site_url(), '7c20dbca959d1a8f22c1f30bf6a1f0e189bc34af');
+		$this->client = new ElggApiClient(elgg_get_site_url(), '00f97424b76918347ddcada3a63fb17758939399');
 		$result = $this->client->obtainAuthToken($this->user->username, 'pass123');
 		if (!$result) {
 		   echo "Error in getting auth token!\n";
@@ -57,6 +69,7 @@ class ElggWebServicesGroupTest extends ElggCoreUnitTest {
 	public function __destruct() {
 		$this->user->delete();
 		$this->group->delete();
+		$this->apikey->delete();
 		elgg_set_ignore_access($this->ia);
 		// all __destruct() code should go above here
 		parent::__destruct();

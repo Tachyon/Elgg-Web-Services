@@ -22,13 +22,25 @@ class ElggWebServicesUserTest extends ElggCoreUnitTest {
 		$this->user->save();
 		// all __construct() code should come after here
 		$this->user2 = new ElggUser();
+		
+		// generating API key
+		$keypair = create_api_user($CONFIG->site_id);
+		if ($keypair)
+		{
+			$this->apikey = new ElggObject();
+			$this->apikey->subtype = 'api_key';
+			$this->apikey->access_id = ACCESS_PUBLIC;
+			$this->apikey->title = "User web services";
+			$this->apikey->public = $keypair->api_key;
+			$this->apikey->save();
+		}
 	}
 
 	/**
 	 * Called before each test method.
 	 */
 	public function setUp() {
-		$this->client = new ElggApiClient(elgg_get_site_url(), '7c20dbca959d1a8f22c1f30bf6a1f0e189bc34af');
+		$this->client = new ElggApiClient(elgg_get_site_url(), $this->apikey->public);
 		$result = $this->client->obtainAuthToken($this->user->username, 'pass123');
 		if (!$result) {
 		   echo "Error in getting auth token!\n";
@@ -49,6 +61,7 @@ class ElggWebServicesUserTest extends ElggCoreUnitTest {
 	public function __destruct() {
 		$this->user->delete();
 		$this->user2->delete();
+		$this->apikey->delete();
 		elgg_set_ignore_access($this->ia);
 		// all __destruct() code should go above here
 		parent::__destruct();
