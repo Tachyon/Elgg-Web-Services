@@ -48,7 +48,7 @@ class ElggWebServicesGroupTest extends ElggCoreUnitTest {
 	 * Called before each test method.
 	 */
 	public function setUp() {
-		$this->client = new ElggApiClient(elgg_get_site_url(), '00f97424b76918347ddcada3a63fb17758939399');
+		$this->client = new ElggApiClient(elgg_get_site_url(), $this->apikey->public);
 		$result = $this->client->obtainAuthToken($this->user->username, 'pass123');
 		if (!$result) {
 		   echo "Error in getting auth token!\n";
