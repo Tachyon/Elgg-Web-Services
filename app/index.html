@@ -1,0 +1,45 @@
+<html>
+<head>
+<title>Elgg</title>
+
+<script type="text/javascript" src="scripts/jquery.js"></script>
+
+<script type="text/javascript">
+	$(document).ready(function(){
+		$("button").click(function(){
+			$.ajax({
+				type: "GET",
+				url: "http://10.0.2.2/elgg/services/api/rest/json/",
+				data: "method=site.getinfo",
+				dataType: "json",
+				success:function(result){
+					alert(result);
+				}
+			});
+		});
+	});
+</script>
+
+<script type="text/javascript">
+	$(document).ready(function(){
+		$.ajax({
+				type: "GET",
+				url: "http://10.0.2.2/elgg/services/api/rest/json/",
+				data: "method=site.getinfo",
+				dataType: "json",
+				success:function(result){
+					$("#sitename").html(result.result.sitename);
+				}
+			});
+	});
+</script>
+
+</head>
+
+<body>
+<h1 id="sitename">title</h1>
+<button>Change Content</button>
+<div id="result">
+</div>
+</body>
+</html>
