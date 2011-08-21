@@ -1,6 +1,75 @@
 Elgg Web Services
 =================
 
+Elgg is an award-winning social networking engine, delivering the building blocks that enable businesses, schools, 
+universities and associations to create their own fully-featured social networks and applications.
+The web services plugin can be installed to any Elgg server and it will enable the web services in that server.
+These web services can be used to provide access to data of that Elgg server and allows developers to build upon 
+and extend their applications in new and creative ways.
+
+Introduction
+--------------------
+
+The Elgg web services are essentially RPC web services the output can be requested as JSON as well as XML. These 
+web services are based on Elgg's web services API.
+
+### Making a web services call
+
+Any call to the web services can be made by calling the URL
+
+	```
+	<site URL>/services/api/rest/<outpput type>/?method=<method name>
+	```
+Here <site URL> : the path of root directory of Elgg website
+	 <outpput type> : json or xml
+	 <method name> : the name of the remote method you want to call
+	 
+Other parameters need to be passed by GET or POST depending on the type of web services is being requested. The request
+type for each web service has been defined later in this document
+
+Getting Started
+--------------------
+
+### Installation
+
+To use these web services in any Elgg installation, just install this plugin. After that generate a API key pair for all 
+the application which use them. This API key willbe needed to passed in every web service request as a variable 'api_key'.
+
+### Configuration
+
+All the web services are divided in seven broad categories
+
+	* Core
+	* User
+	* Group
+	* Wire
+	* Blog
+	* File
+	* Like
+	
+These web serivces can be enabled or disabled depending on reuirement. Any web services can be disabled or enabled from
+ "Web Services" in Admin settings.
+
+### Authentication
+
+Web sevices make use of Elgg's API authentication web service for authetication.
+
+A sample code for authentication will look like this
+
+	```
+	$params = array(
+		'username' => $username,
+		'password' => $password,
+	);
+	$token = $this->post('auth.gettoken', $params);
+	```
+This token will be used for all web services call in the future. This token must be passed in every call as 'auth_token'.
+
+### Client Classes
+
+A PHP class which can be used by client software is included in the Class folder of source code
+And a premature sample of JavaScript clietn is in the app/ folder.
+
 List of Web Services
 --------------------
 
