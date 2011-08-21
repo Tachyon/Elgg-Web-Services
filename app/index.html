@@ -3,6 +3,7 @@
 <title>Elgg</title>
 
 <script type="text/javascript" src="scripts/jquery.js"></script>
+<script type="text/javascript" charset="utf-8" src="scripts/phonegap.js"></script>
 
 <script type="text/javascript">
 	$(document).ready(function(){
@@ -20,8 +21,20 @@
 	});
 </script>
 
+<script type="text/javascript" charset="utf-8">
+	document.addEventListener("deviceready", onDeviceReady, false);
+	function onDeviceReady() {
+		var db = window.openDatabase("elgg", "1.0", "Elgg DB", 1000000);
+		alert(db);
+		var db = window.openDatabase("elgg", "1.0", "Elgg DB", 1000000);
+		alert(db);
+	}
+</script>
+
+
 <script type="text/javascript">
 	$(document).ready(function(){
+		//var dbShell = window.openDatabase("elgg", "1.0", "Elgg DB", 1000000);
 		$.ajax({
 				type: "GET",
 				url: "http://10.0.2.2/elgg/services/api/rest/json/",
