@@ -223,7 +223,7 @@ expose_function('user.register',
 						'password' => array ('type' => 'string'),
 					),
 				"Register user",
-				'GET',
+				'POST',
 				false,
 				false);
 
