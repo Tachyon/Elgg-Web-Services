@@ -107,3 +107,57 @@ expose_function('file.get_files_by_friend',
 				'GET',
 				true,
 				false);
+
+function file_upload_file($fieldname, $description)
+{
+	$result = array();
+	$result["code"] = $_FILES[$fieldname]['error'];
+
+	// Check if the file upload had any error
+	if ($result["code"] !=  UPLOAD_ERR_OK)
+	{
+		$result["message"] = "There was an error in the file upload.";
+		return $result;
+	}
+	$filename = $fieldname;
+
+	$file = new ElggFile();
+
+	if (!$file)
+	{
+		$result["message"] = "File uploaded, but unable to create a FileObject.";
+		return $result;
+	}
+
+	$owner_guid = elgg_get_logged_in_user_guid();
+	$file->title = $filename;
+	$file->description = $description;
+	$fileStoreName = elgg_strtolower(time() . $filename);
+	$file->setFilename($fileStoreName);
+	$mime_type = ElggFile::detectMimeType($_FILES[$fieldname]['tmp_name'], $_FILES[$fieldname]['type']);
+	$file->setMimeType($mime_type);
+	$file->originalfilename = $_FILES[$fieldname]['name'];
+
+	//"Touch" the fileStoreName file (creates if non-existent)
+	$fh = $file->open("write");
+	$file->close();
+
+	move_uploaded_file($_FILES[$fieldname]['tmp_name'], $file->getFilenameOnFilestore());
+
+	$guid = $file->save();
+
+	$result["guid"] = $file->getGUID();
+
+	//TODO Create thumbnails
+	return $result;
+}
+
+expose_function('file.upload_file',
+				"file_upload_file",
+				array('fieldname' => array ('type' => 'string'),
+					  'description' => array ('type' => 'string'),
+					),
+				"Upload a file as multi-part form data and specify the key used to set post data. File will be saved as same name as the key. Returns the GUID of the ElggFile",
+				'POST',
+				false,
+				true);
