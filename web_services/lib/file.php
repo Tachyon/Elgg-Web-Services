@@ -161,3 +161,26 @@ expose_function('file.upload_file',
 				'POST',
 				false,
 				true);
+
+
+function get_file($file_guid)
+{
+	global $CONFIG;
+	$file_obj = get_entity($file_guid);
+	// getFilenameOnFilestore will return /var/www/<data_dir>/path/to/file
+	$full_path = $file_obj->getFilenameOnFilestore();
+	
+	//TODO: Check if $full_path is valid or not
+	$exploded = explode("elgg_data", $full_path);
+	$rel_path = $exploded[1];
+	$result['file_url'] = dirname($CONFIG->url) . '/' . basename($CONFIG->dataroot) . $rel_path;
+	return $result;
+}
+
+expose_function('file.download_file',
+				"get_file",
+				array('file_guid' => array ('type' => 'string')),
+				"Get the URL of the file rep by file_guid",
+				'GET',
+				false,
+				false);
