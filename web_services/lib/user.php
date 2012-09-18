@@ -348,12 +348,16 @@ function user_get_friends($username, $limit = 10, $offset = 0) {
 	$friends = get_user_friends($user->guid, '' , $limit, $offset);
 	
 	$success = false;
+	$friends_array = array();
 	foreach($friends as $friend) {
-		$return[$friend->guid]['username'] = $friend->username;
-		$return[$friend->guid]['name'] = $friend->name;
+		$arr['guid'] = $friend->guid;
+		$arr['username'] = $friend->username;
+		$arr['name'] = $friend->name;
+		$arr['status'] = 'offline';
+		$friends_array[] = $arr;
 		$success = true;
 	}
-	
+	$return['friends']=$friends_array;
 	if(!$success) {
 		$return['error']['message'] = elgg_echo('friends:none');
 	}
