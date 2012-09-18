@@ -132,6 +132,7 @@ function file_upload_file($fieldname, $description)
 	$owner_guid = elgg_get_logged_in_user_guid();
 	$file->title = $filename;
 	$file->description = $description;
+	$file->access_id = ACCESS_PUBLIC;
 	$fileStoreName = elgg_strtolower(time() . $filename);
 	$file->setFilename($fileStoreName);
 	$mime_type = ElggFile::detectMimeType($_FILES[$fieldname]['tmp_name'], $_FILES[$fieldname]['type']);
