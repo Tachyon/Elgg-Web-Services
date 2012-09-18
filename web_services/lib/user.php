@@ -375,6 +375,23 @@ expose_function('user.friend.get_friends',
 				false,
 				false);	
 				
+function get_my_friends()
+{
+	$me = get_entity(elgg_get_logged_in_user_guid());
+	$my_username = $me->username;
+	
+	return user_get_friends($my_username);
+}
+
+expose_function('user.get_my_friends',
+				"get_my_friends",
+				array(
+					),
+				"Get the friends list of the authenticated in user.",
+				'GET',
+				false,
+				true);	
+
 /**
  * Web service to obtains the people who have made a given user a friend
  *
