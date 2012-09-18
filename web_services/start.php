@@ -8,7 +8,7 @@
  */
 function web_services_init() {
 	$action_base = elgg_get_plugins_path() . 'web_services/actions';
-	elgg_register_action('settings/web_services/save', "$action_base/save.php", "admin");
+	elgg_register_action('web_services/settings/save', "$action_base/save.php", "admin");
 	elgg_register_action('web_services/run_tests', "$action_base/web_services/run_tests.php", "admin");
 
 	elgg_register_admin_menu_item('develop', 'web_services', 'utilities');

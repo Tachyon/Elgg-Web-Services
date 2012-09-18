@@ -223,7 +223,7 @@ expose_function('user.register',
 						'password' => array ('type' => 'string'),
 					),
 				"Register user",
-				'GET',
+				'POST',
 				false,
 				false);
 
@@ -348,12 +348,16 @@ function user_get_friends($username, $limit = 10, $offset = 0) {
 	$friends = get_user_friends($user->guid, '' , $limit, $offset);
 	
 	$success = false;
+	$friends_array = array();
 	foreach($friends as $friend) {
-		$return[$friend->guid]['username'] = $friend->username;
-		$return[$friend->guid]['name'] = $friend->name;
+		$arr['guid'] = $friend->guid;
+		$arr['username'] = $friend->username;
+		$arr['name'] = $friend->name;
+		$arr['status'] = 'offline';
+		$friends_array[] = $arr;
 		$success = true;
 	}
-	
+	$return['friends']=$friends_array;
 	if(!$success) {
 		$return['error']['message'] = elgg_echo('friends:none');
 	}
@@ -371,6 +375,23 @@ expose_function('user.friend.get_friends',
 				false,
 				false);	
 				
+function get_my_friends()
+{
+	$me = get_entity(elgg_get_logged_in_user_guid());
+	$my_username = $me->username;
+	
+	return user_get_friends($my_username);
+}
+
+expose_function('user.get_my_friends',
+				"get_my_friends",
+				array(
+					),
+				"Get the friends list of the authenticated in user.",
+				'GET',
+				false,
+				true);	
+
 /**
  * Web service to obtains the people who have made a given user a friend
  *
