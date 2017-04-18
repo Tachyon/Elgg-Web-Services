@@ -72,7 +72,7 @@ function group_join($username, $groupid) {
 	return $return;
 } 
 				
-expose_function('group.join',
+elgg_ws_expose_function('group.join',
 				"group_join",
 				array('username' => array ('type' => 'string'),
 						'groupid' => array ('type' => 'string'),
@@ -116,7 +116,7 @@ function group_leave($username, $groupid) {
 	return $return;
 } 
 				
-expose_function('group.leave',
+elgg_ws_expose_function('group.leave',
 				"group_leave",
 				array('username' => array ('type' => 'string'),
 						'groupid' => array ('type' => 'string'),
@@ -176,7 +176,7 @@ function group_forum_save_post($username, $groupid, $title, $desc, $tags = "", $
 	return $return;
 } 
 				
-expose_function('group.forum.save_post',
+elgg_ws_expose_function('group.forum.save_post',
 				"group_forum_save_post",
 				array('username' => array ('type' => 'string'),
 						'groupid' => array ('type' => 'int'),
@@ -230,7 +230,7 @@ function group_forum_delete_post($username, $topicid) {
 	return $return;
 } 
 				
-expose_function('group.forum.delete_post',
+elgg_ws_expose_function('group.forum.delete_post',
 				"group_forum_delete_post",
 				array('username' => array ('type' => 'string'),
 						'topicid' => array ('type' => 'int'),
@@ -283,7 +283,7 @@ function group_forum_latest_post($groupid, $limit = 10, $offset = 0) {
 	return $post;
 } 
 				
-expose_function('group.forum.get_latest_post',
+elgg_ws_expose_function('group.forum.get_latest_post',
 				"group_forum_latest_post",
 				array('groupid' => array ('type' => 'string'),
 					  'limit' => array ('type' => 'int', 'required' => false),
@@ -332,7 +332,7 @@ function group_forum_get_reply($postid, $limit = 10, $offset = 0) {
 	return $post;
 } 
 				
-expose_function('group.forum.get_reply',
+elgg_ws_expose_function('group.forum.get_reply',
 				"group_forum_get_reply",
 				array('postid' => array ('type' => 'string'),
 					  'limit' => array ('type' => 'int', 'required' => false),
@@ -389,7 +389,7 @@ function group_forum_save_reply($username, $postid, $text) {
 	return $return;
 } 
 				
-expose_function('group.forum.save_reply',
+elgg_ws_expose_function('group.forum.save_reply',
 				"group_forum_save_reply",
 				array('username' => array ('type' => 'string'),
 						'postid' => array ('type' => 'string'),
@@ -438,7 +438,7 @@ function group_forum_delete_reply($username, $id) {
 	}
 } 
 				
-expose_function('group.forum.delete_reply',
+elgg_ws_expose_function('group.forum.delete_reply',
 				"group_forum_delete_reply",
 				array('username' => array ('type' => 'string'),
 						'id' => array ('type' => 'string'),

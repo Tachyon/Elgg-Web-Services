@@ -7,22 +7,23 @@
  */
 
 $english = array(
-	'web_services:user' => "User", 
-	'web_services:blog' => "Blog", 
-	'web_services:wire' => "Wire", 
-	'web_services:core' => "Core", 
-	'web_services:group' => "Group",
-	'web_services:file' => "File",
-	'web_services:selectfeatures' => "Select the features to be enabled",
+	'web_apis:user' => "User", 
+	'web_apis:blog' => "Blog", 
+	'web_apis:wire' => "Wire", 
+	'web_apis:core' => "Core", 
+	'web_apis:group' => "Group",
+	'web_apis:file' => "File",
+	'web_apis:selectfeatures' => "Select the features to be enabled",
 	'friends:alreadyadded' => "%s is already added as friend",
 	'friends:remove:notfriend' => "%s is not your friend",
 	'blog:message:notauthorized' => "Not authorized to carry this request",
 	'blog:message:noposts' => "No blog posts by user",
-
-	'admin:utilities:web_services' => 'Web Services Tests',
-	'web_services:tests:instructions' => 'Run the unit tests for the web services plugin',
-	'web_services:tests:run' => 'Run tests',
-	'web_services:likes' => 'Likes',
+  'utilities' => 'Utilities',
+  'admin:utilities' => 'Admin Utilities',
+	'admin:utilities:web_apis' => 'Web Services Tests',
+	'web_apis:tests:instructions' => 'Run the unit tests for the web services plugin',
+	'web_apis:tests:run' => 'Run tests',
+	'web_apis:likes' => 'Likes',
 	'likes:notallowed' => 'Not allowed to like',
 );
 				

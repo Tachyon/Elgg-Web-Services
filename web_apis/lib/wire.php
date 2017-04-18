@@ -37,7 +37,7 @@ function wire_save_post($username, $text, $access = ACCESS_PUBLIC) {
 	return $return;
 	} 
 				
-expose_function('wire.save_post',
+elgg_ws_expose_function('wire.save_post',
 				"wire_save_post",
 				array('username' => array ('type' => 'string'),
 						'text' => array ('type' => 'string'),
@@ -77,7 +77,7 @@ function wire_get_post($username, $limit = 10, $offset = 0) {
 	return $wire;
 	} 
 				
-expose_function('wire.get_posts',
+elgg_ws_expose_function('wire.get_posts',
 				"wire_get_post",
 				array('username' => array ('type' => 'string'),
 						'limit' => array ('type' => 'int', 'required' => false),
@@ -116,7 +116,7 @@ function wire_get_friends_posts($username, $limit = 10, $offset = 0) {
 	return $wire;
 } 
 				
-expose_function('wire.get_friends_posts',
+elgg_ws_expose_function('wire.get_friends_posts',
 				"wire_get_friends_posts",
 				array('username' => array ('type' => 'string'),
 						'limit' => array ('type' => 'int', 'required' => false),
@@ -168,7 +168,7 @@ function wire_delete($username, $wireid) {
 	return $return;
 } 
 				
-expose_function('wire.delete_posts',
+elgg_ws_expose_function('wire.delete_posts',
 				"wire_delete",
 				array('username' => array ('type' => 'string'),
 						'wireid' => array ('type' => 'int'),

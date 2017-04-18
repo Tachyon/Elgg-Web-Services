@@ -18,7 +18,7 @@ function site_test() {
 	return $response;
 } 
 
-expose_function('site.test',
+elgg_ws_expose_function('site.test',
 				"site_test",
 				array(),
 				"Get site information",
@@ -43,7 +43,7 @@ function site_getinfo() {
 	return $siteinfo;
 } 
 
-expose_function('site.getinfo',
+elgg_ws_expose_function('site.getinfo',
 				"site_getinfo",
 				array(),
 				"Get site information",

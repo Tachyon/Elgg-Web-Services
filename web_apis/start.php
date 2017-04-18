@@ -6,22 +6,23 @@
  * @author Saket Saurabh
  *
  */
-function web_services_init() {
-	$action_base = elgg_get_plugins_path() . 'web_services/actions';
-	elgg_register_action('settings/web_services/save', "$action_base/save.php", "admin");
-	elgg_register_action('web_services/run_tests', "$action_base/web_services/run_tests.php", "admin");
+function web_apis_init() {
+	$action_base = elgg_get_plugins_path() . 'web_apis/actions';
+	elgg_register_action('settings/web_apis/save', "$action_base/save.php", "admin");
+	elgg_register_action('web_apis/run_tests', "$action_base/web_apis/run_tests.php", "admin");
 
-	elgg_register_admin_menu_item('develop', 'web_services', 'utilities');
+	elgg_register_admin_menu_item('develop', 'web_apis', 'utilities');
 
 	// register with a low priority so that we can replace all unit tests
-	elgg_register_plugin_hook_handler('unit_test', 'system', 'web_services_test');
-	elgg_register_admin_menu_item('administer', 'web_services', 'utilities');
+	elgg_register_plugin_hook_handler('unit_test', 'system', 'web_apis_test');
+	elgg_register_admin_menu_item('administer', 'web_apis', 'utilities');
 }
 
-$enabled = unserialize(elgg_get_plugin_setting('enabled_webservices', 'web_services'));
+//$enabled = unserialize(elgg_get_plugin_setting('enabled_webservices', 'web_apis'));
+$enabled = ['user','blog','wire','core','group','file','likes'];
 
 foreach($enabled as $service) {
-	elgg_register_library('webservice:'.$service, elgg_get_plugins_path() . 'web_services/lib/'.$service.'.php');
+	elgg_register_library('webservice:'.$service, elgg_get_plugins_path() . 'web_apis/lib/'.$service.'.php');
 	elgg_load_library('webservice:'.$service);
 }
 
@@ -35,10 +36,11 @@ foreach($enabled as $service) {
  * @param type  $type
  * @return array
  */
-function web_services_test($hook, $type, $value, $params) {
-	$enabled = unserialize(elgg_get_plugin_setting('enabled_webservices', 'web_services'));
+function web_apis_test($hook, $type, $value, $params) {
+	//$enabled = unserialize(elgg_get_plugin_setting('enabled_webservices', 'web_apis'));
+  $enabled = ['user','blog','wire','core','group','file','likes'];
 
-	$base = elgg_get_plugins_path() . 'web_services/tests';
+	$base = elgg_get_plugins_path() . 'web_apis/tests';
 
 	//foreach ($enabled as $service) {
 	//	$location[] = "$base/$service.php";
@@ -46,14 +48,14 @@ function web_services_test($hook, $type, $value, $params) {
 
 	// right now just register user web services
 	//$value = array();
-	$value[] = elgg_get_plugins_path() . 'web_services/tests/user.php';
-	$value[] = elgg_get_plugins_path() . 'web_services/tests/blog.php';
-	$value[] = elgg_get_plugins_path() . 'web_services/tests/group.php';
-	$value[] = elgg_get_plugins_path() . 'web_services/tests/wire.php';
-	$value[] = elgg_get_plugins_path() . 'web_services/tests/file.php';
-	$value[] = elgg_get_plugins_path() . 'web_services/tests/core.php';
+	$value[] = elgg_get_plugins_path() . 'web_apis/tests/user.php';
+	$value[] = elgg_get_plugins_path() . 'web_apis/tests/blog.php';
+	$value[] = elgg_get_plugins_path() . 'web_apis/tests/group.php';
+	$value[] = elgg_get_plugins_path() . 'web_apis/tests/wire.php';
+	$value[] = elgg_get_plugins_path() . 'web_apis/tests/file.php';
+	$value[] = elgg_get_plugins_path() . 'web_apis/tests/core.php';
 	return $value;
 }
 
 
-elgg_register_event_handler('init', 'system', 'web_services_init');
+elgg_register_event_handler('init', 'system', 'web_apis_init');
