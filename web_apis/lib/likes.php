@@ -45,7 +45,7 @@ function likes_add($entity_guid) {
 	return elgg_echo("likes:likes");
 } 
 				
-expose_function('likes.add',
+elgg_ws_expose_function('likes.add',
 				"likes_add",
 				array('entity_guid' => array ('type' => 'int'),
 					),
@@ -77,7 +77,7 @@ function likes_delete($entity_guid) {
 	return elgg_echo("likes:notdeleted");
 } 
 				
-expose_function('likes.delete',
+elgg_ws_expose_function('likes.delete',
 				"likes_delete",
 				array('entity_guid' => array ('type' => 'int'),
 					),
@@ -98,7 +98,7 @@ function likes_count_number_of_likes($entity_guid) {
 	return likes_count($entity);
 } 
 				
-expose_function('likes.count',
+elgg_ws_expose_function('likes.count',
 				"likes_count_number_of_likes",
 				array('entity_guid' => array ('type' => 'int'),
 					),
@@ -131,7 +131,7 @@ function likes_getusers($entity_guid) {
 }
 
 				
-expose_function('likes.getusers',
+elgg_ws_expose_function('likes.getusers',
 				"likes_getusers",
 				array('entity_guid' => array ('type' => 'int'),
 					),

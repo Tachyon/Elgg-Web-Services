@@ -54,7 +54,7 @@ function file_get_files($username, $limit = 10, $offset = 0) {
 	return $file;
 }
 	
-expose_function('file.get_files',
+elgg_ws_expose_function('file.get_files',
 				"file_get_files",
 				array('username' => array ('type' => 'string'),
 					  'limit' => array ('type' => 'int', 'required' => false),
@@ -97,7 +97,7 @@ function file_get_files_by_friend($username, $limit = 10, $offset = 0) {
 	return $file;
 }
 	
-expose_function('file.get_files_by_friend',
+elgg_ws_expose_function('file.get_files_by_friend',
 				"file_get_files_by_friend",
 				array('username' => array ('type' => 'string'),
 					  'limit' => array ('type' => 'int', 'required' => false),

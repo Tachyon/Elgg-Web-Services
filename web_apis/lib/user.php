@@ -21,7 +21,7 @@ function user_get_profile_fields() {
 	return $profile_labels;
 }
 	
-expose_function('user.get_profile_fields',
+elgg_ws_expose_function('user.get_profile_fields',
 				"user_get_profile_fields",
 				array(),
 				"Get user profile labels",
@@ -49,7 +49,7 @@ function user_get_profile($username) {
 	return $user_fields;
 }
 
-expose_function('user.get_profile',
+elgg_ws_expose_function('user.get_profile',
 				"user_get_profile",
 				array('username' => array ('type' => 'string')
 					),
@@ -127,7 +127,7 @@ function user_save_profile($username, $profile) {
 	return "Success";
 }
 	
-expose_function('user.save_profile',
+elgg_ws_expose_function('user.save_profile',
 				"user_save_profile",
 				array('username' => array ('type' => 'string'),
 					 'profile' => array ('type' => 'array'),
@@ -159,7 +159,7 @@ function user_get_user_by_email($email) {
 	return $foundusers;
 }
 
-expose_function('user.get_user_by_email',
+elgg_ws_expose_function('user.get_user_by_email',
 				"user_get_user_by_email",
 				array('email' => array ('type' => 'string'),
 					),
@@ -184,7 +184,7 @@ function user_check_username_availability($username) {
 	}
 }
 
-expose_function('user.check_username_availability',
+elgg_ws_expose_function('user.check_username_availability',
 				"user_check_username_availability",
 				array('username' => array ('type' => 'string'),
 					),
@@ -215,7 +215,7 @@ function user_register($name, $email, $username, $password) {
 	return $return;
 }
 
-expose_function('user.register',
+elgg_ws_expose_function('user.register',
 				"user_register",
 				array('name' => array ('type' => 'string'),
 						'email' => array ('type' => 'string'),
@@ -270,7 +270,7 @@ function user_friend_add($username, $friend) {
 	return $return;
 }
 
-expose_function('user.friend.add',
+elgg_ws_expose_function('user.friend.add',
 				"user_friend_add",
 				array('username' => array ('type' => 'string'),
 						'friend' => array ('type' => 'string'),
@@ -321,7 +321,7 @@ function user_friend_remove($username, $friend) {
 	return $return;
 }
 
-expose_function('user.friend.remove',
+elgg_ws_expose_function('user.friend.remove',
 				"user_friend_remove",
 				array('username' => array ('type' => 'string'),
 						'friend' => array ('type' => 'string'),
@@ -360,7 +360,7 @@ function user_get_friends($username, $limit = 10, $offset = 0) {
 	return $return;
 }
 
-expose_function('user.friend.get_friends',
+elgg_ws_expose_function('user.friend.get_friends',
 				"user_get_friends",
 				array('username' => array ('type' => 'string', 'required' => true),
 						'limit' => array ('type' => 'int', 'required' => false),
@@ -400,7 +400,7 @@ function user_get_friends_of($username, $limit = 10, $offset = 0) {
 	return $return;
 }
 
-expose_function('user.friend.get_friends_of',
+elgg_ws_expose_function('user.friend.get_friends_of',
 				"user_get_friends_of",
 				array('username' => array ('type' => 'string', 'required' => true),
 						'limit' => array ('type' => 'int', 'required' => false),

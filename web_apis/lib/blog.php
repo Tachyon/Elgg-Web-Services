@@ -47,7 +47,7 @@ function blog_save($username, $title, $text, $excerpt = "", $tags = "blog" , $ac
 	return $return;
 	} 
 	
-expose_function('blog.save_post',
+elgg_ws_expose_function('blog.save_post',
 				"blog_save",
 				array('username' => array ('type' => 'string', 'required' => true),
 						'title' => array ('type' => 'string', 'required' => true),
@@ -115,7 +115,7 @@ function blog_get_post($guid, $username) {
 	return $return;
 }
 	
-expose_function('blog.get_post',
+elgg_ws_expose_function('blog.get_post',
 				"blog_get_post",
 				array('guid' => array ('type' => 'string'),
 						'username' => array ('type' => 'string'),
@@ -166,7 +166,7 @@ function blog_delete_post($guid, $username) {
 	return $return;
 }
 	
-expose_function('blog.delete_post',
+elgg_ws_expose_function('blog.delete_post',
 				"blog_delete_post",
 				array('guid' => array ('type' => 'string'),
 						'username' => array ('type' => 'string'),
@@ -219,7 +219,7 @@ function blog_get_friends_posts($username, $limit = 10, $offset = 0) {
 	return $blog;
 	} 
 				
-expose_function('blog.get_friends_posts',
+elgg_ws_expose_function('blog.get_friends_posts',
 				"blog_get_friends_posts",
 				array('username' => array ('type' => 'string'),
 						'limit' => array ('type' => 'int', 'required' => false),
@@ -293,7 +293,7 @@ function blog_get_latest_posts($username = NULL, $limit = 10, $offset = 0) {
 	return $blog;
 	} 
 				
-expose_function('blog.get_latest_posts',
+elgg_ws_expose_function('blog.get_latest_posts',
 				"blog_get_latest_posts",
 				array('username' => array ('type' => 'string', 'required' => false),
 						'limit' => array ('type' => 'int', 'required' => false),
