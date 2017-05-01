@@ -208,6 +208,8 @@ function user_register($name, $email, $username, $password) {
 	if (!$user) {
 		$return['success'] = true;
 		$return['guid'] = register_user($username, $password, $name, $email);
+    // add to river
+    // to be add
 	} else {
 		$return['success'] = false;
 		$return['message'] = elgg_echo('registration:userexists');

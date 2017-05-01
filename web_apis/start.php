@@ -16,6 +16,13 @@ function web_apis_init() {
 	// register with a low priority so that we can replace all unit tests
 	elgg_register_plugin_hook_handler('unit_test', 'system', 'web_apis_test');
 	elgg_register_admin_menu_item('administer', 'web_apis', 'utilities');
+
+  // grant write permission
+  elgg_register_plugin_hook_handler('permissions_check', 'all', 'myplugin_permissions_check');
+}
+
+function myplugin_permissions_check(){
+  return true;
 }
 
 //$enabled = unserialize(elgg_get_plugin_setting('enabled_webservices', 'web_apis'));
@@ -57,5 +64,8 @@ function web_apis_test($hook, $type, $value, $params) {
 	return $value;
 }
 
+function function_true(){
+  return true;
+}
 
 elgg_register_event_handler('init', 'system', 'web_apis_init');
