@@ -26,7 +26,7 @@ function myplugin_permissions_check(){
 }
 
 //$enabled = unserialize(elgg_get_plugin_setting('enabled_webservices', 'web_apis'));
-$enabled = ['user','blog','wire','core','group','file','likes'];
+$enabled = ['user','blog','wire','core','group','file','likes','comment'];
 
 foreach($enabled as $service) {
 	elgg_register_library('webservice:'.$service, elgg_get_plugins_path() . 'web_apis/lib/'.$service.'.php');
@@ -45,7 +45,7 @@ foreach($enabled as $service) {
  */
 function web_apis_test($hook, $type, $value, $params) {
 	//$enabled = unserialize(elgg_get_plugin_setting('enabled_webservices', 'web_apis'));
-  $enabled = ['user','blog','wire','core','group','file','likes'];
+  $enabled = ['user','blog','wire','core','group','file','likes','comment'];
 
 	$base = elgg_get_plugins_path() . 'web_apis/tests';
 
