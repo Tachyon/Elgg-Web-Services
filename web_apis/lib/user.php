@@ -117,14 +117,14 @@ function user_save_profile($username, $profile) {
 				foreach ($value as $interval) {
 					$i++;
 					$multiple = ($i > 1) ? TRUE : FALSE;
-					create_metadata($owner->guid, $shortname, $interval, 'text', $owner->guid, $access_id, $multiple);
+					$result = create_metadata($owner->guid, $shortname, $interval, 'text', $owner->guid, $access_id, $multiple);
 				}
 			} else {
-				create_metadata($owner->guid, $shortname, $value, 'text', $owner->guid, $access_id);
+				$result = create_metadata($owner->guid, $shortname, $value, 'text', $owner->guid, $access_id);
 			}
 		}
 	}
-	return "Success";
+	return $result;
 }
 	
 elgg_ws_expose_function('user.save_profile',
