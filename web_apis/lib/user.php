@@ -41,7 +41,6 @@ function user_get_profile($username) {
 	if (!$user) {
 		throw new InvalidParameterException('registration:usernamenotvalid');
 	}
-	
 	$user_fields = elgg_get_config('profile_fields');
 	foreach ($user_fields as $key => $type) {
 		$user_fields[$key] = $user->$key;
@@ -64,7 +63,8 @@ elgg_ws_expose_function('user.get_profile',
  *
  * @return bool 
  */
-function user_save_profile($username, $profile) {
+function user_save_profile($username, $profile, $access = ACCESS_PUBLIC) {
+  $access_id = strip_tags($access);
 	$user = get_user_by_username($username);
 	if (!$user) {
 		throw new InvalidParameterException('registration:usernamenotvalid');
@@ -98,7 +98,7 @@ function user_save_profile($username, $profile) {
 			}
 		}
 	}
-	
+
 	if (sizeof($input) > 0) {
 		foreach ($input as $shortname => $value) {
 			$options = array(
@@ -106,12 +106,13 @@ function user_save_profile($username, $profile) {
 				'metadata_name' => $shortname
 			);
 			elgg_delete_metadata($options);
-			if (isset($accesslevel[$shortname])) {
-				$access_id = (int) $accesslevel[$shortname];
-			} else {
-				// this should never be executed since the access level should always be set
-				$access_id = ACCESS_DEFAULT;
-			}
+
+			//if (isset($accesslevel[$shortname])) {
+			//	$access_id = (int) $accesslevel[$shortname];
+			//} else {
+			//	// this should never be executed since the access level should always be set
+			//	$access_id = ACCESS_DEFAULT;
+			//}
 			if (is_array($value)) {
 				$i = 0;
 				foreach ($value as $interval) {
@@ -120,11 +121,16 @@ function user_save_profile($username, $profile) {
 					$result = create_metadata($owner->guid, $shortname, $interval, 'text', $owner->guid, $access_id, $multiple);
 				}
 			} else {
+        // test here ------------------x-xxxxxxxxxxxxxxx--------------
+        //$shortname = 'descriptionsss'; $value = 'dsfs';
 				$result = create_metadata($owner->guid, $shortname, $value, 'text', $owner->guid, $access_id);
+				//$result = create_metadata($owner->guid, $shortname, $value, 'text', $owner->guid, $access_id);
+        return array($owner->$shortname);
+        //return array($access_id);
 			}
 		}
 	}
-	return $result;
+	return array($result);
 }
 	
 elgg_ws_expose_function('user.save_profile',
