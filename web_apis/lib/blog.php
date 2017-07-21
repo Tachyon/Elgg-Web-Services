@@ -36,14 +36,26 @@ function blog_save($username, $title, $text, $excerpt = "", $tags = "blog" , $ac
 	$obj->comments_on = 'On';
 	$obj->excerpt = strip_tags($excerpt);
 	$obj->tags = strip_tags($tags);
+
+elgg_register_plugin_hook_handler('permissions_check', 'object','function_true');
+
 	$guid = $obj->save();
-	add_to_river('river/object/blog/create',
-	'create',
-	$user->guid,
-	$obj->guid
-	);
-	$return['success'] = true;
-	$return['message'] = elgg_echo('blog:message:saved');
+
+elgg_unregister_plugin_hook_handler('permissions_check', 'object','function_true');
+
+  if($guid){
+	  add_to_river('river/object/blog/create',
+	  'create',
+	  $user->guid,
+	  $obj->guid
+	  );
+	  $return['success'] = true;
+	  $return['message'] = elgg_echo('blog:message:saved');
+  }
+	else{
+    $return['success'] = false;
+    $return['message'] = elgg_echo('blog:save:fail');
+	}
 	return $return;
 	} 
 	

@@ -14,7 +14,9 @@
  *
  * @return bool
  */
-function likes_add($entity_guid) {
+// add username to denote like initializer
+//function likes_add($entity_guid) {
+function likes_add($username, $entity_guid) {
 	if (elgg_annotation_exists($entity_guid, 'likes')) {
 		return elgg_echo("likes:alreadyliked");
 	}
@@ -29,7 +31,8 @@ function likes_add($entity_guid) {
 		return elgg_echo("likes:notallowed");
 	}
 
-	$user = elgg_get_logged_in_user_entity();
+	//$user = elgg_get_logged_in_user_entity();
+  $user = get_user_by_username($username);
 	$annotation = create_annotation($entity->guid,
 									'likes',
 									"likes",
@@ -47,7 +50,8 @@ function likes_add($entity_guid) {
 				
 elgg_ws_expose_function('likes.add',
 				"likes_add",
-				array('entity_guid' => array ('type' => 'int'),
+				array('username' => array ('type' => 'string', 'required' => true),
+              'entity_guid' => array ('type' => 'int'),
 					),
 				"Add a like",
 				'POST',
